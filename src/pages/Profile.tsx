@@ -345,9 +345,9 @@ const Profile = () => {
               <Label>Tipos de campo e preços</Label>
               <div className="grid grid-cols-1 gap-3">
                 {FIELD_TYPE_OPTIONS.map((opt) => (
-                  <div
+                  <label
                     key={opt.value}
-                    className="flex items-center gap-3 p-3 rounded-lg border border-border hover:border-primary/50 transition-colors"
+                    className="flex items-center gap-3 p-3 rounded-lg border border-border hover:border-primary/50 transition-colors cursor-pointer"
                   >
                     <Checkbox
                       checked={fieldTypes.includes(opt.value)}
@@ -359,7 +359,7 @@ const Profile = () => {
                         R$ {FIXED_PRICES[opt.value]}
                       </span>
                     )}
-                  </div>
+                  </label>
                 ))}
               </div>
             </div>
