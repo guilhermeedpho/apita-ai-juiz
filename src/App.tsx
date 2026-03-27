@@ -27,6 +27,7 @@ const App = () => (
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/perfil" element={<Profile />} />
             <Route path="/admin" element={<Admin />} />
+            <Route path="/instalar" element={<Install />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
