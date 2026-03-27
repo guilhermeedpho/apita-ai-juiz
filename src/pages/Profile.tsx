@@ -147,13 +147,7 @@ const Profile = () => {
 
     const numericPrices: Record<string, number> = {};
     for (const ft of fieldTypes) {
-      const val = parseInt(pricesByField[ft] || "0");
-      if (isNaN(val) || val < 0) {
-        const label = FIELD_TYPE_OPTIONS.find((o) => o.value === ft)?.label || ft;
-        toast({ title: `Preço inválido para ${label}`, variant: "destructive" });
-        return;
-      }
-      numericPrices[ft] = val;
+      numericPrices[ft] = FIXED_PRICES[ft] || 0;
     }
 
     const avgPrice = Math.round(Object.values(numericPrices).reduce((a, b) => a + b, 0) / fieldTypes.length);
