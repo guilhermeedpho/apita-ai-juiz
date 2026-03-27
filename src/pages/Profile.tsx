@@ -177,10 +177,11 @@ const Profile = () => {
         .from("referees")
         .insert({
           user_id: user.id,
-          price_per_match: price,
+          price_per_match: avgPrice,
           field_types: fieldTypes,
           region: refereeRegion.trim() || null,
-        });
+          prices_by_field: numericPrices,
+        } as any);
 
       if (!error) {
         // Add referee role
