@@ -57,6 +57,7 @@ const Auth = () => {
     } else {
       toast({ title: "Cadastro realizado!" });
       navigate("/");
+    }
   };
 
   const handleSignIn = async (e: React.FormEvent) => {
