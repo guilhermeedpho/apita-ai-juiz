@@ -213,6 +213,12 @@ const Profile = () => {
     setPricesByField((prev) => ({ ...prev, [field]: value }));
   };
 
+  const toggleCompetitionLevel = (value: string) => {
+    setCompetitionLevels((prev) =>
+      prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value]
+    );
+  };
+
   const handleDocumentUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!user || !e.target.files?.[0]) return;
 
