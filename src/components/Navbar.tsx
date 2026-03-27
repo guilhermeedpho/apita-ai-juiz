@@ -26,6 +26,12 @@ const Navbar = () => {
         <div className="flex items-center gap-3">
           {user ? (
             <>
+              {isAdmin && (
+                <Button variant="ghost" size="sm" onClick={() => navigate("/admin")} className="font-medium">
+                  <ShieldCheck className="h-4 w-4 mr-1" />
+                  <span className="hidden sm:inline">Admin</span>
+                </Button>
+              )}
               <Button variant="ghost" size="sm" onClick={() => navigate("/perfil")} className="font-medium">
                 <User className="h-4 w-4 mr-1" />
                 <span className="hidden sm:inline">Perfil</span>
