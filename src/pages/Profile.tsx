@@ -21,6 +21,12 @@ const FIELD_TYPE_OPTIONS = [
   { value: "areia", label: "Futebol de Areia" },
 ];
 
+const COMPETITION_LEVEL_OPTIONS = [
+  { value: "pelada", label: "Pelada / Amador" },
+  { value: "competitivo", label: "Competitivo / Liga" },
+  { value: "profissional", label: "Profissional" },
+];
+
 const Profile = () => {
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
