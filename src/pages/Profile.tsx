@@ -14,6 +14,13 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { Upload, CheckCircle, Clock, XCircle, User, Phone, MapPin, FileText, Shield, DollarSign } from "lucide-react";
 
+const FIXED_PRICES: Record<string, number> = {
+  society: 130,
+  campo: 200,
+  futsal: 100,
+  areia: 100,
+};
+
 const FIELD_TYPE_OPTIONS = [
   { value: "society", label: "Society" },
   { value: "campo", label: "Campo (11x11)" },
