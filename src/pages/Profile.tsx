@@ -14,6 +14,13 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { Upload, CheckCircle, Clock, XCircle, User, Phone, MapPin, FileText, Shield, DollarSign } from "lucide-react";
 
+const FIXED_PRICES: Record<string, number> = {
+  society: 130,
+  campo: 200,
+  futsal: 100,
+  areia: 100,
+};
+
 const FIELD_TYPE_OPTIONS = [
   { value: "society", label: "Society" },
   { value: "campo", label: "Campo (11x11)" },
@@ -45,7 +52,7 @@ const Profile = () => {
   // Referee state
   const [isReferee, setIsReferee] = useState(false);
   const [fieldTypes, setFieldTypes] = useState<string[]>([]);
-  const [pricesByField, setPricesByField] = useState<Record<string, string>>({});
+  // Prices are now fixed per field type
   const [refereeRegion, setRefereeRegion] = useState("");
   const [competitionLevels, setCompetitionLevels] = useState<string[]>([]);
   const [savingReferee, setSavingReferee] = useState(false);
@@ -87,12 +94,6 @@ const Profile = () => {
         setFieldTypes(data.field_types || []);
         setRefereeRegion(data.region || "");
         setCompetitionLevels((data as any).competition_levels || []);
-        const prices = (data as any).prices_by_field as Record<string, number> | null;
-        if (prices) {
-          const mapped: Record<string, string> = {};
-          Object.entries(prices).forEach(([k, v]) => { mapped[k] = String(v); });
-          setPricesByField(mapped);
-        }
       }
     };
 
@@ -146,13 +147,7 @@ const Profile = () => {
 
     const numericPrices: Record<string, number> = {};
     for (const ft of fieldTypes) {
-      const val = parseInt(pricesByField[ft] || "0");
-      if (isNaN(val) || val < 0) {
-        const label = FIELD_TYPE_OPTIONS.find((o) => o.value === ft)?.label || ft;
-        toast({ title: `Preço inválido para ${label}`, variant: "destructive" });
-        return;
-      }
-      numericPrices[ft] = val;
+      numericPrices[ft] = FIXED_PRICES[ft] || 0;
     }
 
     const avgPrice = Math.round(Object.values(numericPrices).reduce((a, b) => a + b, 0) / fieldTypes.length);
@@ -209,9 +204,6 @@ const Profile = () => {
     );
   };
 
-  const updateFieldPrice = (field: string, value: string) => {
-    setPricesByField((prev) => ({ ...prev, [field]: value }));
-  };
 
   const toggleCompetitionLevel = (value: string) => {
     setCompetitionLevels((prev) =>
@@ -363,17 +355,9 @@ const Profile = () => {
                     />
                     <span className="text-sm flex-1">{opt.label}</span>
                     {fieldTypes.includes(opt.value) && (
-                      <div className="flex items-center gap-1">
-                        <span className="text-xs text-muted-foreground">R$</span>
-                        <Input
-                          type="number"
-                          min="0"
-                          className="w-24 h-8 text-sm"
-                          value={pricesByField[opt.value] || ""}
-                          onChange={(e) => updateFieldPrice(opt.value, e.target.value)}
-                          placeholder="100"
-                        />
-                      </div>
+                      <span className="text-sm font-medium text-primary">
+                        R$ {FIXED_PRICES[opt.value]}
+                      </span>
                     )}
                   </div>
                 ))}

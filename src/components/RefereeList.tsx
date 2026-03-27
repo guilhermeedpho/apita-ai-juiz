@@ -26,6 +26,13 @@ const FIELD_LABELS: Record<string, string> = {
   areia: "Futebol de Areia",
 };
 
+const FIXED_PRICES: Record<string, number> = {
+  society: 130,
+  campo: 200,
+  futsal: 100,
+  areia: 100,
+};
+
 const RefereeList = () => {
   const [referees, setReferees] = useState<RefereeData[]>([]);
   const [loading, setLoading] = useState(true);
