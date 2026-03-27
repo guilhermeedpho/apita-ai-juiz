@@ -32,7 +32,7 @@ const Profile = () => {
   const [bio, setBio] = useState("");
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
-  const [documentType, setDocumentType] = useState<"rg" | "cnh">("rg");
+  const [documentType, setDocumentType] = useState<"rg" | "cnh" | "cnh-e">("rg");
   const [verificationStatus, setVerificationStatus] = useState<string | null>(null);
   const [profileLoaded, setProfileLoaded] = useState(false);
 
