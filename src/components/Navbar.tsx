@@ -1,11 +1,20 @@
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Shield, LogOut, User } from "lucide-react";
+import { Shield, LogOut, User, ShieldCheck } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 
 const Navbar = () => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    if (!user) { setIsAdmin(false); return; }
+    supabase.rpc("has_role", { _user_id: user.id, _role: "admin" as const })
+      .then(({ data }) => setIsAdmin(!!data));
+  }, [user]);
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border">
@@ -17,6 +26,12 @@ const Navbar = () => {
         <div className="flex items-center gap-3">
           {user ? (
             <>
+              {isAdmin && (
+                <Button variant="ghost" size="sm" onClick={() => navigate("/admin")} className="font-medium">
+                  <ShieldCheck className="h-4 w-4 mr-1" />
+                  <span className="hidden sm:inline">Admin</span>
+                </Button>
+              )}
               <Button variant="ghost" size="sm" onClick={() => navigate("/perfil")} className="font-medium">
                 <User className="h-4 w-4 mr-1" />
                 <span className="hidden sm:inline">Perfil</span>
