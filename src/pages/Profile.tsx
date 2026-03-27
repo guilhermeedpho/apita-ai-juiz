@@ -390,6 +390,24 @@ const Profile = () => {
               />
             </div>
 
+            <div className="space-y-2">
+              <Label>Nível de competição</Label>
+              <div className="grid grid-cols-1 gap-3">
+                {COMPETITION_LEVEL_OPTIONS.map((opt) => (
+                  <label
+                    key={opt.value}
+                    className="flex items-center gap-2 cursor-pointer p-2 rounded-lg border border-border hover:border-primary/50 transition-colors"
+                  >
+                    <Checkbox
+                      checked={competitionLevels.includes(opt.value)}
+                      onCheckedChange={() => toggleCompetitionLevel(opt.value)}
+                    />
+                    <span className="text-sm">{opt.label}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
             <Button onClick={handleSaveReferee} disabled={savingReferee} className="w-full font-semibold">
               {savingReferee
                 ? "Salvando..."
