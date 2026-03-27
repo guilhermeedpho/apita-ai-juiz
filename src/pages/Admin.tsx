@@ -158,8 +158,10 @@ const Admin = () => {
           <ShieldCheck className="h-8 w-8 text-primary" />
           PAINEL ADMIN
         </h1>
+        {/* Financial Dashboard */}
+        <AdminFinancials />
 
-        {/* Filters */}
+        {/* Verification Filters */}
         <div className="flex gap-2 justify-center flex-wrap">
           {(["pending", "approved", "rejected", "all"] as const).map((f) => (
             <Button
