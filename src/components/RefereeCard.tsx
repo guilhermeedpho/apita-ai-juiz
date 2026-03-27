@@ -31,6 +31,7 @@ const RefereeCard = ({
   matches,
   price,
   fieldTypes,
+  rawFieldTypes = [],
   competitionLevels = [],
   avatar,
   refereeId,
