@@ -204,9 +204,6 @@ const Profile = () => {
     );
   };
 
-  const updateFieldPrice = (field: string, value: string) => {
-    setPricesByField((prev) => ({ ...prev, [field]: value }));
-  };
 
   const toggleCompetitionLevel = (value: string) => {
     setCompetitionLevels((prev) =>
