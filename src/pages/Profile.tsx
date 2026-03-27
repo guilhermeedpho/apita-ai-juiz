@@ -412,11 +412,11 @@ const Profile = () => {
             {verificationStatus !== "approved" && (
               <>
                 <p className="text-sm text-muted-foreground">
-                  Envie uma foto do seu <strong>RG</strong> ou <strong>CNH</strong> para verificar sua identidade.
+                  Envie uma foto do seu <strong>RG</strong>, <strong>CNH</strong> ou <strong>CNH-e (digital)</strong> para verificar sua identidade.
                   Aceitos: JPG, PNG, WebP ou PDF (máx. 5MB).
                 </p>
 
-                <div className="flex gap-2">
+                <div className="flex gap-2 flex-wrap">
                   <Button
                     variant={documentType === "rg" ? "default" : "outline"}
                     size="sm"
@@ -430,6 +430,13 @@ const Profile = () => {
                     onClick={() => setDocumentType("cnh")}
                   >
                     CNH
+                  </Button>
+                  <Button
+                    variant={documentType === "cnh-e" ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setDocumentType("cnh-e")}
+                  >
+                    CNH-e (Digital)
                   </Button>
                 </div>
 
