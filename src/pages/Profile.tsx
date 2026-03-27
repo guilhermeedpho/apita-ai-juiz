@@ -334,20 +334,35 @@ const Profile = () => {
             )}
 
             <div className="space-y-2">
-              <Label htmlFor="pricePerMatch" className="flex items-center gap-1">
-                <DollarSign className="h-3.5 w-3.5" /> Preço por partida (R$)
-              </Label>
-              <Input
-                id="pricePerMatch"
-                type="number"
-                min="0"
-                value={pricePerMatch}
-                onChange={(e) => setPricePerMatch(e.target.value)}
-                placeholder="100"
-              />
+              <Label>Tipos de campo e preços</Label>
+              <div className="grid grid-cols-1 gap-3">
+                {FIELD_TYPE_OPTIONS.map((opt) => (
+                  <div
+                    key={opt.value}
+                    className="flex items-center gap-3 p-3 rounded-lg border border-border hover:border-primary/50 transition-colors"
+                  >
+                    <Checkbox
+                      checked={fieldTypes.includes(opt.value)}
+                      onCheckedChange={() => toggleFieldType(opt.value)}
+                    />
+                    <span className="text-sm flex-1">{opt.label}</span>
+                    {fieldTypes.includes(opt.value) && (
+                      <div className="flex items-center gap-1">
+                        <span className="text-xs text-muted-foreground">R$</span>
+                        <Input
+                          type="number"
+                          min="0"
+                          className="w-24 h-8 text-sm"
+                          value={pricesByField[opt.value] || ""}
+                          onChange={(e) => updateFieldPrice(opt.value, e.target.value)}
+                          placeholder="100"
+                        />
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
-
-            <div className="space-y-2">
               <Label className="flex items-center gap-1">
                 <MapPin className="h-3.5 w-3.5" /> Região de atuação
               </Label>
