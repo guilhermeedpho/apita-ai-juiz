@@ -10,8 +10,16 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
-import { Upload, CheckCircle, Clock, XCircle, User, Phone, MapPin, FileText } from "lucide-react";
+import { Upload, CheckCircle, Clock, XCircle, User, Phone, MapPin, FileText, Shield, DollarSign } from "lucide-react";
+
+const FIELD_TYPE_OPTIONS = [
+  { value: "society", label: "Society" },
+  { value: "campo", label: "Campo (11x11)" },
+  { value: "futsal", label: "Futsal" },
+  { value: "areia", label: "Futebol de Areia" },
+];
 
 const Profile = () => {
   const { user, loading: authLoading } = useAuth();
@@ -27,6 +35,13 @@ const Profile = () => {
   const [documentType, setDocumentType] = useState<"rg" | "cnh">("rg");
   const [verificationStatus, setVerificationStatus] = useState<string | null>(null);
   const [profileLoaded, setProfileLoaded] = useState(false);
+
+  // Referee state
+  const [isReferee, setIsReferee] = useState(false);
+  const [pricePerMatch, setPricePerMatch] = useState("100");
+  const [fieldTypes, setFieldTypes] = useState<string[]>([]);
+  const [refereeRegion, setRefereeRegion] = useState("");
+  const [savingReferee, setSavingReferee] = useState(false);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -53,6 +68,21 @@ const Profile = () => {
       setProfileLoaded(true);
     };
 
+    const fetchReferee = async () => {
+      const { data } = await supabase
+        .from("referees")
+        .select("*")
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+      if (data) {
+        setIsReferee(true);
+        setPricePerMatch(String(data.price_per_match));
+        setFieldTypes(data.field_types || []);
+        setRefereeRegion(data.region || "");
+      }
+    };
+
     const fetchVerification = async () => {
       const { data } = await supabase
         .from("identity_verifications")
@@ -68,6 +98,7 @@ const Profile = () => {
     };
 
     fetchProfile();
+    fetchReferee();
     fetchVerification();
   }, [user]);
 
@@ -91,6 +122,66 @@ const Profile = () => {
     } else {
       toast({ title: "Perfil atualizado!" });
     }
+  };
+
+  const handleSaveReferee = async () => {
+    if (!user) return;
+    if (fieldTypes.length === 0) {
+      toast({ title: "Selecione ao menos um tipo de campo", variant: "destructive" });
+      return;
+    }
+    const price = parseInt(pricePerMatch);
+    if (isNaN(price) || price < 0) {
+      toast({ title: "Preço inválido", variant: "destructive" });
+      return;
+    }
+
+    setSavingReferee(true);
+
+    if (isReferee) {
+      // Update existing
+      const { error } = await supabase
+        .from("referees")
+        .update({
+          price_per_match: price,
+          field_types: fieldTypes,
+          region: refereeRegion.trim() || null,
+        })
+        .eq("user_id", user.id);
+
+      setSavingReferee(false);
+      if (error) {
+        toast({ title: "Erro ao atualizar", description: error.message, variant: "destructive" });
+      } else {
+        toast({ title: "Dados de árbitro atualizados!" });
+      }
+    } else {
+      // Create new referee
+      const { error } = await supabase
+        .from("referees")
+        .insert({
+          user_id: user.id,
+          price_per_match: price,
+          field_types: fieldTypes,
+          region: refereeRegion.trim() || null,
+        });
+
+      if (!error) {
+        // Add referee role
+        await supabase.from("user_roles").insert({ user_id: user.id, role: "referee" as const });
+        setIsReferee(true);
+        toast({ title: "Cadastro como árbitro realizado!", description: "Agora você aparece na lista de árbitros." });
+      } else {
+        toast({ title: "Erro ao cadastrar", description: error.message, variant: "destructive" });
+      }
+      setSavingReferee(false);
+    }
+  };
+
+  const toggleFieldType = (value: string) => {
+    setFieldTypes((prev) =>
+      prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value]
+    );
   };
 
   const handleDocumentUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -204,6 +295,74 @@ const Profile = () => {
             </div>
             <Button onClick={handleSaveProfile} disabled={saving} className="w-full font-semibold">
               {saving ? "Salvando..." : "Salvar perfil"}
+            </Button>
+          </CardContent>
+        </Card>
+
+        {/* Referee Registration */}
+        <Card className="bg-gradient-card border-border shadow-card">
+          <CardHeader>
+            <CardTitle className="text-xl flex items-center gap-2">
+              <Shield className="h-5 w-5 text-primary" />
+              {isReferee ? "DADOS DE ÁRBITRO" : "QUERO SER ÁRBITRO"}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {!isReferee && (
+              <p className="text-sm text-muted-foreground">
+                Cadastre-se como árbitro para aparecer na lista e receber convites para partidas.
+              </p>
+            )}
+
+            <div className="space-y-2">
+              <Label htmlFor="pricePerMatch" className="flex items-center gap-1">
+                <DollarSign className="h-3.5 w-3.5" /> Preço por partida (R$)
+              </Label>
+              <Input
+                id="pricePerMatch"
+                type="number"
+                min="0"
+                value={pricePerMatch}
+                onChange={(e) => setPricePerMatch(e.target.value)}
+                placeholder="100"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label className="flex items-center gap-1">
+                <MapPin className="h-3.5 w-3.5" /> Região de atuação
+              </Label>
+              <Input
+                value={refereeRegion}
+                onChange={(e) => setRefereeRegion(e.target.value)}
+                placeholder="São Paulo - Zona Sul"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Tipos de campo</Label>
+              <div className="grid grid-cols-2 gap-3">
+                {FIELD_TYPE_OPTIONS.map((opt) => (
+                  <label
+                    key={opt.value}
+                    className="flex items-center gap-2 cursor-pointer p-2 rounded-lg border border-border hover:border-primary/50 transition-colors"
+                  >
+                    <Checkbox
+                      checked={fieldTypes.includes(opt.value)}
+                      onCheckedChange={() => toggleFieldType(opt.value)}
+                    />
+                    <span className="text-sm">{opt.label}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            <Button onClick={handleSaveReferee} disabled={savingReferee} className="w-full font-semibold">
+              {savingReferee
+                ? "Salvando..."
+                : isReferee
+                ? "Atualizar dados de árbitro"
+                : "Cadastrar como árbitro"}
             </Button>
           </CardContent>
         </Card>
