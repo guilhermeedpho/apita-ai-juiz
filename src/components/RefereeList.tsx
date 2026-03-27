@@ -120,6 +120,7 @@ const RefereeList = () => {
                 matches={ref.reviewCount}
                 price={ref.price_per_match}
                 fieldTypes={ref.field_types.map((ft) => FIELD_LABELS[ft] || ft)}
+                rawFieldTypes={ref.field_types}
                 competitionLevels={ref.competition_levels}
                 isVerified={ref.is_verified}
                 avatar={

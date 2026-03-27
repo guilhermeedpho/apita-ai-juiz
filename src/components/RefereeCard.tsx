@@ -1,8 +1,8 @@
 import { motion } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Star, MapPin, Clock, ShieldCheck, Trophy } from "lucide-react";
 import ReviewDialog from "./ReviewDialog";
+import BookingDialog from "./BookingDialog";
 
 interface RefereeCardProps {
   name: string;
@@ -11,6 +11,7 @@ interface RefereeCardProps {
   matches: number;
   price: number;
   fieldTypes: string[];
+  rawFieldTypes?: string[];
   competitionLevels?: string[];
   avatar: string;
   refereeId?: string;
@@ -30,6 +31,7 @@ const RefereeCard = ({
   matches,
   price,
   fieldTypes,
+  rawFieldTypes = [],
   competitionLevels = [],
   avatar,
   refereeId,
@@ -104,9 +106,13 @@ const RefereeCard = ({
             {refereeId && (
               <ReviewDialog refereeId={refereeId} refereeName={name} />
             )}
-            <Button size="sm" className="font-semibold">
-              Agendar
-            </Button>
+            {refereeId && rawFieldTypes.length > 0 && (
+              <BookingDialog
+                refereeId={refereeId}
+                refereeName={name}
+                availableFieldTypes={rawFieldTypes}
+              />
+            )}
           </div>
         </div>
       </div>

@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { ShieldCheck, FileText, CheckCircle, XCircle, Eye, Clock } from "lucide-react";
+import AdminFinancials from "@/components/AdminFinancials";
 
 interface Verification {
   id: string;
@@ -157,8 +158,10 @@ const Admin = () => {
           <ShieldCheck className="h-8 w-8 text-primary" />
           PAINEL ADMIN
         </h1>
+        {/* Financial Dashboard */}
+        <AdminFinancials />
 
-        {/* Filters */}
+        {/* Verification Filters */}
         <div className="flex gap-2 justify-center flex-wrap">
           {(["pending", "approved", "rejected", "all"] as const).map((f) => (
             <Button
