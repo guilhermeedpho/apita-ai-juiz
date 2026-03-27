@@ -21,6 +21,12 @@ const FIELD_TYPE_OPTIONS = [
   { value: "areia", label: "Futebol de Areia" },
 ];
 
+const COMPETITION_LEVEL_OPTIONS = [
+  { value: "pelada", label: "Pelada / Amador" },
+  { value: "competitivo", label: "Competitivo / Liga" },
+  { value: "profissional", label: "Profissional" },
+];
+
 const Profile = () => {
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
@@ -41,6 +47,7 @@ const Profile = () => {
   const [fieldTypes, setFieldTypes] = useState<string[]>([]);
   const [pricesByField, setPricesByField] = useState<Record<string, string>>({});
   const [refereeRegion, setRefereeRegion] = useState("");
+  const [competitionLevels, setCompetitionLevels] = useState<string[]>([]);
   const [savingReferee, setSavingReferee] = useState(false);
 
   useEffect(() => {
@@ -79,6 +86,7 @@ const Profile = () => {
         setIsReferee(true);
         setFieldTypes(data.field_types || []);
         setRefereeRegion(data.region || "");
+        setCompetitionLevels((data as any).competition_levels || []);
         const prices = (data as any).prices_by_field as Record<string, number> | null;
         if (prices) {
           const mapped: Record<string, string> = {};
@@ -160,6 +168,7 @@ const Profile = () => {
           field_types: fieldTypes,
           region: refereeRegion.trim() || null,
           prices_by_field: numericPrices,
+          competition_levels: competitionLevels,
         } as any)
         .eq("user_id", user.id);
 
@@ -179,6 +188,7 @@ const Profile = () => {
           field_types: fieldTypes,
           region: refereeRegion.trim() || null,
           prices_by_field: numericPrices,
+          competition_levels: competitionLevels,
         } as any);
 
       if (!error) {
@@ -201,6 +211,12 @@ const Profile = () => {
 
   const updateFieldPrice = (field: string, value: string) => {
     setPricesByField((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const toggleCompetitionLevel = (value: string) => {
+    setCompetitionLevels((prev) =>
+      prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value]
+    );
   };
 
   const handleDocumentUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -372,6 +388,24 @@ const Profile = () => {
                 onChange={(e) => setRefereeRegion(e.target.value)}
                 placeholder="São Paulo - Zona Sul"
               />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Nível de competição</Label>
+              <div className="grid grid-cols-1 gap-3">
+                {COMPETITION_LEVEL_OPTIONS.map((opt) => (
+                  <label
+                    key={opt.value}
+                    className="flex items-center gap-2 cursor-pointer p-2 rounded-lg border border-border hover:border-primary/50 transition-colors"
+                  >
+                    <Checkbox
+                      checked={competitionLevels.includes(opt.value)}
+                      onCheckedChange={() => toggleCompetitionLevel(opt.value)}
+                    />
+                    <span className="text-sm">{opt.label}</span>
+                  </label>
+                ))}
+              </div>
             </div>
 
             <Button onClick={handleSaveReferee} disabled={savingReferee} className="w-full font-semibold">

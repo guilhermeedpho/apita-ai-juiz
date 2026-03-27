@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Star, MapPin, Clock, ShieldCheck } from "lucide-react";
+import { Star, MapPin, Clock, ShieldCheck, Trophy } from "lucide-react";
 import ReviewDialog from "./ReviewDialog";
 
 interface RefereeCardProps {
@@ -11,11 +11,17 @@ interface RefereeCardProps {
   matches: number;
   price: number;
   fieldTypes: string[];
-  available: string[];
+  competitionLevels?: string[];
   avatar: string;
   refereeId?: string;
   isVerified?: boolean;
 }
+
+const LEVEL_LABELS: Record<string, string> = {
+  pelada: "Pelada",
+  competitivo: "Competitivo",
+  profissional: "Profissional",
+};
 
 const RefereeCard = ({
   name,
@@ -24,7 +30,7 @@ const RefereeCard = ({
   matches,
   price,
   fieldTypes,
-  available,
+  competitionLevels = [],
   avatar,
   refereeId,
   isVerified,
@@ -60,7 +66,7 @@ const RefereeCard = ({
           </div>
         </div>
 
-        <div className="flex flex-wrap gap-1.5 mb-4">
+        <div className="flex flex-wrap gap-1.5 mb-3">
           {fieldTypes.map((ft) => (
             <Badge key={ft} variant="secondary" className="text-xs font-medium">
               {ft}
@@ -68,20 +74,23 @@ const RefereeCard = ({
           ))}
         </div>
 
+        {competitionLevels.length > 0 && (
+          <div className="flex flex-wrap gap-1.5 mb-3">
+            {competitionLevels.map((level) => (
+              <span
+                key={level}
+                className="text-xs px-2 py-1 rounded-md bg-accent/15 text-accent font-medium flex items-center gap-1"
+              >
+                <Trophy className="h-3 w-3" />
+                {LEVEL_LABELS[level] || level}
+              </span>
+            ))}
+          </div>
+        )}
+
         <div className="flex items-center gap-1 text-sm text-muted-foreground mb-4">
           <Clock className="h-3.5 w-3.5" />
           <span>{matches} partidas realizadas</span>
-        </div>
-
-        <div className="flex flex-wrap gap-1.5 mb-5">
-          {available.map((slot) => (
-            <span
-              key={slot}
-              className="text-xs px-2 py-1 rounded-md bg-primary/10 text-primary font-medium"
-            >
-              {slot}
-            </span>
-          ))}
         </div>
 
         <div className="flex items-center justify-between">
