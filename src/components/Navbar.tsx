@@ -8,6 +8,13 @@ import { supabase } from "@/integrations/supabase/client";
 const Navbar = () => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    if (!user) { setIsAdmin(false); return; }
+    supabase.rpc("has_role", { _user_id: user.id, _role: "admin" as const })
+      .then(({ data }) => setIsAdmin(!!data));
+  }, [user]);
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border">
