@@ -52,7 +52,7 @@ const Profile = () => {
   // Referee state
   const [isReferee, setIsReferee] = useState(false);
   const [fieldTypes, setFieldTypes] = useState<string[]>([]);
-  const [pricesByField, setPricesByField] = useState<Record<string, string>>({});
+  // Prices are now fixed per field type
   const [refereeRegion, setRefereeRegion] = useState("");
   const [competitionLevels, setCompetitionLevels] = useState<string[]>([]);
   const [savingReferee, setSavingReferee] = useState(false);
