@@ -55,8 +55,8 @@ const Auth = () => {
     if (error) {
       toast({ title: "Erro ao cadastrar", description: error.message, variant: "destructive" });
     } else {
-      toast({ title: "Cadastro realizado!", description: "Verifique seu email para confirmar." });
-    }
+      toast({ title: "Cadastro realizado!" });
+      navigate("/");
   };
 
   const handleSignIn = async (e: React.FormEvent) => {
