@@ -47,6 +47,7 @@ const Profile = () => {
   const [fieldTypes, setFieldTypes] = useState<string[]>([]);
   const [pricesByField, setPricesByField] = useState<Record<string, string>>({});
   const [refereeRegion, setRefereeRegion] = useState("");
+  const [competitionLevels, setCompetitionLevels] = useState<string[]>([]);
   const [savingReferee, setSavingReferee] = useState(false);
 
   useEffect(() => {
