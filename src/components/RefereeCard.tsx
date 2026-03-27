@@ -1,7 +1,8 @@
 import { motion } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Star, MapPin, Clock } from "lucide-react";
+import { Star, MapPin, Clock, ShieldCheck } from "lucide-react";
+import ReviewDialog from "./ReviewDialog";
 
 interface RefereeCardProps {
   name: string;
@@ -12,6 +13,8 @@ interface RefereeCardProps {
   fieldTypes: string[];
   available: string[];
   avatar: string;
+  refereeId?: string;
+  isVerified?: boolean;
 }
 
 const RefereeCard = ({
@@ -23,6 +26,8 @@ const RefereeCard = ({
   fieldTypes,
   available,
   avatar,
+  refereeId,
+  isVerified,
 }: RefereeCardProps) => {
   return (
     <motion.div
@@ -38,7 +43,12 @@ const RefereeCard = ({
             <img src={avatar} alt={name} className="w-full h-full object-cover" />
           </div>
           <div className="flex-1 min-w-0">
-            <h3 className="font-display text-xl truncate">{name}</h3>
+            <div className="flex items-center gap-1.5">
+              <h3 className="font-display text-xl truncate">{name}</h3>
+              {isVerified && (
+                <ShieldCheck className="h-4 w-4 text-primary flex-shrink-0" />
+              )}
+            </div>
             <div className="flex items-center gap-1 text-sm text-muted-foreground">
               <MapPin className="h-3.5 w-3.5" />
               <span>{region}</span>
@@ -81,9 +91,14 @@ const RefereeCard = ({
             </span>
             <span className="text-sm text-muted-foreground">/partida</span>
           </div>
-          <Button size="sm" className="font-semibold">
-            Agendar
-          </Button>
+          <div className="flex items-center gap-2">
+            {refereeId && (
+              <ReviewDialog refereeId={refereeId} refereeName={name} />
+            )}
+            <Button size="sm" className="font-semibold">
+              Agendar
+            </Button>
+          </div>
         </div>
       </div>
     </motion.div>
