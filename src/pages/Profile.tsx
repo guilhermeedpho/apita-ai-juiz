@@ -201,6 +201,10 @@ const Profile = () => {
     );
   };
 
+  const updateFieldPrice = (field: string, value: string) => {
+    setPricesByField((prev) => ({ ...prev, [field]: value }));
+  };
+
   const handleDocumentUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!user || !e.target.files?.[0]) return;
 
