@@ -10,7 +10,6 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { Upload, CheckCircle, Clock, XCircle, User, Phone, MapPin, FileText, Shield, DollarSign } from "lucide-react";
 
@@ -56,6 +55,7 @@ const Profile = () => {
   const [refereeRegion, setRefereeRegion] = useState("");
   const [competitionLevels, setCompetitionLevels] = useState<string[]>([]);
   const [savingReferee, setSavingReferee] = useState(false);
+  const [refereeError, setRefereeError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -141,9 +141,13 @@ const Profile = () => {
   const handleSaveReferee = async () => {
     if (!user) return;
     if (fieldTypes.length === 0) {
+      setRefereeError("Selecione pelo menos um tipo de campo para continuar.");
+      document.getElementById("referee-field-types")?.scrollIntoView({ behavior: "smooth", block: "center" });
       toast({ title: "Selecione ao menos um tipo de campo", variant: "destructive" });
       return;
     }
+
+    setRefereeError(null);
 
     const numericPrices: Record<string, number> = {};
     for (const ft of fieldTypes) {
@@ -199,6 +203,7 @@ const Profile = () => {
   };
 
   const toggleFieldType = (value: string) => {
+    setRefereeError(null);
     setFieldTypes((prev) =>
       prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value]
     );
@@ -341,27 +346,49 @@ const Profile = () => {
               </p>
             )}
 
-            <div className="space-y-2">
-              <Label>Tipos de campo e preços</Label>
+            <div id="referee-field-types" className="space-y-2 scroll-mt-28">
+              <div className="flex items-center justify-between gap-3">
+                <Label>Tipos de campo e preços</Label>
+                {fieldTypes.length > 0 && (
+                  <span className="text-xs font-medium text-primary">
+                    {fieldTypes.length} selecionado{fieldTypes.length > 1 ? "s" : ""}
+                  </span>
+                )}
+              </div>
               <div className="grid grid-cols-1 gap-3">
                 {FIELD_TYPE_OPTIONS.map((opt) => (
-                  <label
+                  <button
+                    type="button"
                     key={opt.value}
-                    className="flex items-center gap-3 p-3 rounded-lg border border-border hover:border-primary/50 transition-colors cursor-pointer"
+                    onClick={() => toggleFieldType(opt.value)}
+                    aria-pressed={fieldTypes.includes(opt.value)}
+                    className={`flex items-center gap-3 rounded-lg border p-4 text-left transition-colors ${
+                      fieldTypes.includes(opt.value)
+                        ? "border-primary bg-primary/5"
+                        : "border-border hover:border-primary/50"
+                    }`}
                   >
-                    <Checkbox
-                      checked={fieldTypes.includes(opt.value)}
-                      onCheckedChange={() => toggleFieldType(opt.value)}
-                    />
+                    <span
+                      className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border transition-colors ${
+                        fieldTypes.includes(opt.value)
+                          ? "border-primary bg-primary text-primary-foreground"
+                          : "border-border text-transparent"
+                      }`}
+                    >
+                      <CheckCircle className="h-3.5 w-3.5" />
+                    </span>
                     <span className="text-sm flex-1">{opt.label}</span>
                     {fieldTypes.includes(opt.value) && (
                       <span className="text-sm font-medium text-primary">
                         R$ {FIXED_PRICES[opt.value]}
                       </span>
                     )}
-                  </label>
+                  </button>
                 ))}
               </div>
+              {refereeError && (
+                <p className="text-sm font-medium text-destructive">{refereeError}</p>
+              )}
             </div>
             <div className="space-y-2">
               <Label className="flex items-center gap-1">
@@ -378,16 +405,28 @@ const Profile = () => {
               <Label>Nível de competição</Label>
               <div className="grid grid-cols-1 gap-3">
                 {COMPETITION_LEVEL_OPTIONS.map((opt) => (
-                  <label
+                  <button
+                    type="button"
                     key={opt.value}
-                    className="flex items-center gap-2 cursor-pointer p-2 rounded-lg border border-border hover:border-primary/50 transition-colors"
+                    onClick={() => toggleCompetitionLevel(opt.value)}
+                    aria-pressed={competitionLevels.includes(opt.value)}
+                    className={`flex items-center justify-between gap-3 rounded-lg border p-3 text-left transition-colors ${
+                      competitionLevels.includes(opt.value)
+                        ? "border-primary bg-primary/5"
+                        : "border-border hover:border-primary/50"
+                    }`}
                   >
-                    <Checkbox
-                      checked={competitionLevels.includes(opt.value)}
-                      onCheckedChange={() => toggleCompetitionLevel(opt.value)}
-                    />
                     <span className="text-sm">{opt.label}</span>
-                  </label>
+                    <span
+                      className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border transition-colors ${
+                        competitionLevels.includes(opt.value)
+                          ? "border-primary bg-primary text-primary-foreground"
+                          : "border-border text-transparent"
+                      }`}
+                    >
+                      <CheckCircle className="h-3.5 w-3.5" />
+                    </span>
+                  </button>
                 ))}
               </div>
             </div>
