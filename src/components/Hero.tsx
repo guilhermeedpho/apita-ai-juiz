@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import heroImage from "@/assets/hero-referee.jpg";
 
 const Hero = () => {
+  const navigate = useNavigate();
   return (
     <section className="relative min-h-[90vh] flex items-center overflow-hidden">
       {/* Background image */}
