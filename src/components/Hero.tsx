@@ -41,8 +41,9 @@ const Hero = () => {
               <Search className="mr-2 h-5 w-5" />
               Encontrar Árbitro
             </Button>
-            <Button variant="outline" size="lg" className="text-lg px-8 py-6 font-semibold border-border hover:bg-secondary">
-              Sou Árbitro
+            <Button variant="outline" size="lg" className="text-lg px-8 py-6 font-semibold border-border hover:bg-secondary" onClick={() => navigate("/auth")}>
+              <ShieldCheck className="mr-2 h-5 w-5" />
+              Quero Ser Árbitro
             </Button>
           </div>
         </motion.div>
