@@ -1,0 +1,1 @@
+ALTER TABLE public.referees ADD COLUMN prices_by_field jsonb NOT NULL DEFAULT '{}'::jsonb;

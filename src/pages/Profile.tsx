@@ -38,8 +38,8 @@ const Profile = () => {
 
   // Referee state
   const [isReferee, setIsReferee] = useState(false);
-  const [pricePerMatch, setPricePerMatch] = useState("100");
   const [fieldTypes, setFieldTypes] = useState<string[]>([]);
+  const [pricesByField, setPricesByField] = useState<Record<string, string>>({});
   const [refereeRegion, setRefereeRegion] = useState("");
   const [savingReferee, setSavingReferee] = useState(false);
 
@@ -77,9 +77,14 @@ const Profile = () => {
 
       if (data) {
         setIsReferee(true);
-        setPricePerMatch(String(data.price_per_match));
         setFieldTypes(data.field_types || []);
         setRefereeRegion(data.region || "");
+        const prices = (data as any).prices_by_field as Record<string, number> | null;
+        if (prices) {
+          const mapped: Record<string, string> = {};
+          Object.entries(prices).forEach(([k, v]) => { mapped[k] = String(v); });
+          setPricesByField(mapped);
+        }
       }
     };
 
@@ -130,11 +135,19 @@ const Profile = () => {
       toast({ title: "Selecione ao menos um tipo de campo", variant: "destructive" });
       return;
     }
-    const price = parseInt(pricePerMatch);
-    if (isNaN(price) || price < 0) {
-      toast({ title: "Preço inválido", variant: "destructive" });
-      return;
+
+    const numericPrices: Record<string, number> = {};
+    for (const ft of fieldTypes) {
+      const val = parseInt(pricesByField[ft] || "0");
+      if (isNaN(val) || val < 0) {
+        const label = FIELD_TYPE_OPTIONS.find((o) => o.value === ft)?.label || ft;
+        toast({ title: `Preço inválido para ${label}`, variant: "destructive" });
+        return;
+      }
+      numericPrices[ft] = val;
     }
+
+    const avgPrice = Math.round(Object.values(numericPrices).reduce((a, b) => a + b, 0) / fieldTypes.length);
 
     setSavingReferee(true);
 
@@ -143,10 +156,11 @@ const Profile = () => {
       const { error } = await supabase
         .from("referees")
         .update({
-          price_per_match: price,
+          price_per_match: avgPrice,
           field_types: fieldTypes,
           region: refereeRegion.trim() || null,
-        })
+          prices_by_field: numericPrices,
+        } as any)
         .eq("user_id", user.id);
 
       setSavingReferee(false);
@@ -161,10 +175,11 @@ const Profile = () => {
         .from("referees")
         .insert({
           user_id: user.id,
-          price_per_match: price,
+          price_per_match: avgPrice,
           field_types: fieldTypes,
           region: refereeRegion.trim() || null,
-        });
+          prices_by_field: numericPrices,
+        } as any);
 
       if (!error) {
         // Add referee role
@@ -182,6 +197,10 @@ const Profile = () => {
     setFieldTypes((prev) =>
       prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value]
     );
+  };
+
+  const updateFieldPrice = (field: string, value: string) => {
+    setPricesByField((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleDocumentUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -315,19 +334,35 @@ const Profile = () => {
             )}
 
             <div className="space-y-2">
-              <Label htmlFor="pricePerMatch" className="flex items-center gap-1">
-                <DollarSign className="h-3.5 w-3.5" /> Preço por partida (R$)
-              </Label>
-              <Input
-                id="pricePerMatch"
-                type="number"
-                min="0"
-                value={pricePerMatch}
-                onChange={(e) => setPricePerMatch(e.target.value)}
-                placeholder="100"
-              />
+              <Label>Tipos de campo e preços</Label>
+              <div className="grid grid-cols-1 gap-3">
+                {FIELD_TYPE_OPTIONS.map((opt) => (
+                  <div
+                    key={opt.value}
+                    className="flex items-center gap-3 p-3 rounded-lg border border-border hover:border-primary/50 transition-colors"
+                  >
+                    <Checkbox
+                      checked={fieldTypes.includes(opt.value)}
+                      onCheckedChange={() => toggleFieldType(opt.value)}
+                    />
+                    <span className="text-sm flex-1">{opt.label}</span>
+                    {fieldTypes.includes(opt.value) && (
+                      <div className="flex items-center gap-1">
+                        <span className="text-xs text-muted-foreground">R$</span>
+                        <Input
+                          type="number"
+                          min="0"
+                          className="w-24 h-8 text-sm"
+                          value={pricesByField[opt.value] || ""}
+                          onChange={(e) => updateFieldPrice(opt.value, e.target.value)}
+                          placeholder="100"
+                        />
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
-
             <div className="space-y-2">
               <Label className="flex items-center gap-1">
                 <MapPin className="h-3.5 w-3.5" /> Região de atuação
@@ -337,24 +372,6 @@ const Profile = () => {
                 onChange={(e) => setRefereeRegion(e.target.value)}
                 placeholder="São Paulo - Zona Sul"
               />
-            </div>
-
-            <div className="space-y-2">
-              <Label>Tipos de campo</Label>
-              <div className="grid grid-cols-2 gap-3">
-                {FIELD_TYPE_OPTIONS.map((opt) => (
-                  <label
-                    key={opt.value}
-                    className="flex items-center gap-2 cursor-pointer p-2 rounded-lg border border-border hover:border-primary/50 transition-colors"
-                  >
-                    <Checkbox
-                      checked={fieldTypes.includes(opt.value)}
-                      onCheckedChange={() => toggleFieldType(opt.value)}
-                    />
-                    <span className="text-sm">{opt.label}</span>
-                  </label>
-                ))}
-              </div>
             </div>
 
             <Button onClick={handleSaveReferee} disabled={savingReferee} className="w-full font-semibold">
