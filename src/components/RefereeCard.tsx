@@ -106,9 +106,13 @@ const RefereeCard = ({
             {refereeId && (
               <ReviewDialog refereeId={refereeId} refereeName={name} />
             )}
-            <Button size="sm" className="font-semibold">
-              Agendar
-            </Button>
+            {refereeId && rawFieldTypes.length > 0 && (
+              <BookingDialog
+                refereeId={refereeId}
+                refereeName={name}
+                availableFieldTypes={rawFieldTypes}
+              />
+            )}
           </div>
         </div>
       </div>
