@@ -1,0 +1,1 @@
+ALTER TABLE public.referees ADD COLUMN competition_levels text[] NOT NULL DEFAULT '{}'::text[];

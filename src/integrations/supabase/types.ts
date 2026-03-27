@@ -82,6 +82,7 @@ export type Database = {
       }
       referees: {
         Row: {
+          competition_levels: string[]
           created_at: string
           field_types: string[]
           id: string
@@ -93,6 +94,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          competition_levels?: string[]
           created_at?: string
           field_types?: string[]
           id?: string
@@ -104,6 +106,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          competition_levels?: string[]
           created_at?: string
           field_types?: string[]
           id?: string
