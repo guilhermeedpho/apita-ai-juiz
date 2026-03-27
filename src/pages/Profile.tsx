@@ -94,12 +94,6 @@ const Profile = () => {
         setFieldTypes(data.field_types || []);
         setRefereeRegion(data.region || "");
         setCompetitionLevels((data as any).competition_levels || []);
-        const prices = (data as any).prices_by_field as Record<string, number> | null;
-        if (prices) {
-          const mapped: Record<string, string> = {};
-          Object.entries(prices).forEach(([k, v]) => { mapped[k] = String(v); });
-          setPricesByField(mapped);
-        }
       }
     };
 
