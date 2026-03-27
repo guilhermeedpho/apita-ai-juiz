@@ -44,6 +44,59 @@ export type Database = {
         }
         Relationships: []
       }
+      matches: {
+        Row: {
+          created_at: string
+          field_type: string
+          id: string
+          location: string
+          notes: string | null
+          platform_fee: number
+          price: number
+          referee_id: string
+          referee_payout: number
+          requester_id: string
+          scheduled_at: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          field_type: string
+          id?: string
+          location: string
+          notes?: string | null
+          platform_fee: number
+          price: number
+          referee_id: string
+          referee_payout: number
+          requester_id: string
+          scheduled_at: string
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          field_type?: string
+          id?: string
+          location?: string
+          notes?: string | null
+          platform_fee?: number
+          price?: number
+          referee_id?: string
+          referee_payout?: number
+          requester_id?: string
+          scheduled_at?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "matches_referee_id_fkey"
+            columns: ["referee_id"]
+            isOneToOne: false
+            referencedRelation: "referees"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
