@@ -188,6 +188,7 @@ const Profile = () => {
           field_types: fieldTypes,
           region: refereeRegion.trim() || null,
           prices_by_field: numericPrices,
+          competition_levels: competitionLevels,
         } as any);
 
       if (!error) {
