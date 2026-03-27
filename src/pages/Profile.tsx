@@ -12,7 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
-import { Upload, CheckCircle, Clock, XCircle, User, Phone, MapPin, FileText, Whistle, DollarSign } from "lucide-react";
+import { Upload, CheckCircle, Clock, XCircle, User, Phone, MapPin, FileText, Shield, DollarSign } from "lucide-react";
 
 const FIELD_TYPE_OPTIONS = [
   { value: "society", label: "Society" },
