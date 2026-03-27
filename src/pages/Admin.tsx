@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { ShieldCheck, FileText, CheckCircle, XCircle, Eye, Clock } from "lucide-react";
+import AdminFinancials from "@/components/AdminFinancials";
 
 interface Verification {
   id: string;
