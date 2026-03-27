@@ -42,8 +42,6 @@ const Profile = () => {
   const [pricesByField, setPricesByField] = useState<Record<string, string>>({});
   const [refereeRegion, setRefereeRegion] = useState("");
   const [savingReferee, setSavingReferee] = useState(false);
-  const [refereeRegion, setRefereeRegion] = useState("");
-  const [savingReferee, setSavingReferee] = useState(false);
 
   useEffect(() => {
     if (!authLoading && !user) {
