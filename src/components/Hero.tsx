@@ -1,9 +1,11 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Search } from "lucide-react";
+import { Search, ShieldCheck } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import heroImage from "@/assets/hero-referee.jpg";
 
 const Hero = () => {
+  const navigate = useNavigate();
   return (
     <section className="relative min-h-[90vh] flex items-center overflow-hidden">
       {/* Background image */}
@@ -39,8 +41,9 @@ const Hero = () => {
               <Search className="mr-2 h-5 w-5" />
               Encontrar Árbitro
             </Button>
-            <Button variant="outline" size="lg" className="text-lg px-8 py-6 font-semibold border-border hover:bg-secondary">
-              Sou Árbitro
+            <Button variant="outline" size="lg" className="text-lg px-8 py-6 font-semibold border-border hover:bg-secondary" onClick={() => navigate("/auth")}>
+              <ShieldCheck className="mr-2 h-5 w-5" />
+              Quero Ser Árbitro
             </Button>
           </div>
         </motion.div>
