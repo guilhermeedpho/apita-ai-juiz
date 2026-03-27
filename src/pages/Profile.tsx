@@ -363,6 +363,7 @@ const Profile = () => {
                 ))}
               </div>
             </div>
+            <div className="space-y-2">
               <Label className="flex items-center gap-1">
                 <MapPin className="h-3.5 w-3.5" /> Região de atuação
               </Label>
@@ -371,24 +372,6 @@ const Profile = () => {
                 onChange={(e) => setRefereeRegion(e.target.value)}
                 placeholder="São Paulo - Zona Sul"
               />
-            </div>
-
-            <div className="space-y-2">
-              <Label>Tipos de campo</Label>
-              <div className="grid grid-cols-2 gap-3">
-                {FIELD_TYPE_OPTIONS.map((opt) => (
-                  <label
-                    key={opt.value}
-                    className="flex items-center gap-2 cursor-pointer p-2 rounded-lg border border-border hover:border-primary/50 transition-colors"
-                  >
-                    <Checkbox
-                      checked={fieldTypes.includes(opt.value)}
-                      onCheckedChange={() => toggleFieldType(opt.value)}
-                    />
-                    <span className="text-sm">{opt.label}</span>
-                  </label>
-                ))}
-              </div>
             </div>
 
             <Button onClick={handleSaveReferee} disabled={savingReferee} className="w-full font-semibold">
