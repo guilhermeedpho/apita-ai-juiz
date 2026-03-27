@@ -355,17 +355,9 @@ const Profile = () => {
                     />
                     <span className="text-sm flex-1">{opt.label}</span>
                     {fieldTypes.includes(opt.value) && (
-                      <div className="flex items-center gap-1">
-                        <span className="text-xs text-muted-foreground">R$</span>
-                        <Input
-                          type="number"
-                          min="0"
-                          className="w-24 h-8 text-sm"
-                          value={pricesByField[opt.value] || ""}
-                          onChange={(e) => updateFieldPrice(opt.value, e.target.value)}
-                          placeholder="100"
-                        />
-                      </div>
+                      <span className="text-sm font-medium text-primary">
+                        R$ {FIXED_PRICES[opt.value]}
+                      </span>
                     )}
                   </div>
                 ))}
