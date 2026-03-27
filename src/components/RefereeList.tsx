@@ -1,70 +1,90 @@
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import { supabase } from "@/integrations/supabase/client";
 import RefereeCard from "./RefereeCard";
 
-const mockReferees = [
-  {
-    name: "Carlos Silva",
-    region: "Zona Sul - SP",
-    rating: 4.9,
-    matches: 342,
-    price: 120,
-    fieldTypes: ["Society", "Quadra"],
-    available: ["Sáb 14h", "Sáb 16h", "Dom 10h"],
-    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face",
-  },
-  {
-    name: "Roberto Santos",
-    region: "Zona Norte - SP",
-    rating: 4.7,
-    matches: 215,
-    price: 100,
-    fieldTypes: ["Society", "Campo Profissional"],
-    available: ["Sáb 18h", "Dom 08h", "Dom 14h"],
-    avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face",
-  },
-  {
-    name: "André Oliveira",
-    region: "ABC Paulista",
-    rating: 4.8,
-    matches: 189,
-    price: 110,
-    fieldTypes: ["Quadra", "Society"],
-    available: ["Sex 20h", "Sáb 10h", "Sáb 14h"],
-    avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face",
-  },
-  {
-    name: "Marcos Pereira",
-    region: "Zona Leste - SP",
-    rating: 4.6,
-    matches: 156,
-    price: 90,
-    fieldTypes: ["Campo Profissional", "Society", "Quadra"],
-    available: ["Sáb 08h", "Sáb 16h", "Dom 16h"],
-    avatar: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100&h=100&fit=crop&crop=face",
-  },
-  {
-    name: "Felipe Costa",
-    region: "Zona Oeste - SP",
-    rating: 4.9,
-    matches: 278,
-    price: 130,
-    fieldTypes: ["Society"],
-    available: ["Sáb 10h", "Dom 10h", "Dom 16h"],
-    avatar: "https://images.unsplash.com/photo-1519345182560-3f2917c472ef?w=100&h=100&fit=crop&crop=face",
-  },
-  {
-    name: "Lucas Mendes",
-    region: "Guarulhos",
-    rating: 4.5,
-    matches: 98,
-    price: 85,
-    fieldTypes: ["Quadra", "Campo Profissional"],
-    available: ["Sex 21h", "Sáb 14h", "Dom 08h"],
-    avatar: "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=100&h=100&fit=crop&crop=face",
-  },
-];
+interface RefereeData {
+  id: string;
+  user_id: string;
+  price_per_match: number;
+  field_types: string[];
+  region: string | null;
+  is_verified: boolean;
+  competition_levels?: string[];
+  profile?: {
+    full_name: string;
+    avatar_url: string | null;
+  };
+  reviewCount: number;
+  avgRating: number;
+}
+
+const FIELD_LABELS: Record<string, string> = {
+  society: "Society",
+  campo: "Campo (11x11)",
+  futsal: "Futsal",
+  areia: "Futebol de Areia",
+};
 
 const RefereeList = () => {
+  const [referees, setReferees] = useState<RefereeData[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchReferees = async () => {
+      const { data: refereesData } = await supabase
+        .from("referees")
+        .select("*");
+
+      if (!refereesData || refereesData.length === 0) {
+        setLoading(false);
+        return;
+      }
+
+      const userIds = refereesData.map((r) => r.user_id);
+
+      const { data: profiles } = await supabase
+        .from("profiles")
+        .select("user_id, full_name, avatar_url")
+        .in("user_id", userIds);
+
+      const { data: reviews } = await supabase
+        .from("reviews")
+        .select("referee_id, rating");
+
+      const profileMap = new Map(
+        (profiles || []).map((p) => [p.user_id, p])
+      );
+
+      const reviewMap = new Map<string, { count: number; total: number }>();
+      (reviews || []).forEach((r) => {
+        const existing = reviewMap.get(r.referee_id) || { count: 0, total: 0 };
+        existing.count++;
+        existing.total += r.rating;
+        reviewMap.set(r.referee_id, existing);
+      });
+
+      const mapped: RefereeData[] = refereesData.map((r) => {
+        const profile = profileMap.get(r.user_id);
+        const reviewStats = reviewMap.get(r.id) || { count: 0, total: 0 };
+        return {
+          ...r,
+          competition_levels: (r as any).competition_levels || [],
+          profile: profile
+            ? { full_name: profile.full_name, avatar_url: profile.avatar_url }
+            : undefined,
+          reviewCount: reviewStats.count,
+          avgRating: reviewStats.count > 0 ? reviewStats.total / reviewStats.count : 0,
+        };
+      });
+
+      setReferees(mapped);
+      setLoading(false);
+    };
+
+    fetchReferees();
+  }, []);
+
   return (
     <section className="py-16">
       <div className="container mx-auto px-4">
@@ -77,11 +97,32 @@ const RefereeList = () => {
           ÁRBITROS <span className="text-gradient-primary">DISPONÍVEIS</span>
         </motion.h2>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {mockReferees.map((ref) => (
-            <RefereeCard key={ref.name} {...ref} />
-          ))}
-        </div>
+        {loading ? (
+          <p className="text-muted-foreground text-center py-8">Carregando árbitros...</p>
+        ) : referees.length === 0 ? (
+          <p className="text-muted-foreground text-center py-8">Nenhum árbitro cadastrado ainda.</p>
+        ) : (
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {referees.map((ref) => (
+              <RefereeCard
+                key={ref.id}
+                refereeId={ref.id}
+                name={ref.profile?.full_name || "Árbitro"}
+                region={ref.region || "Não informada"}
+                rating={ref.avgRating}
+                matches={ref.reviewCount}
+                price={ref.price_per_match}
+                fieldTypes={ref.field_types.map((ft) => FIELD_LABELS[ft] || ft)}
+                competitionLevels={ref.competition_levels}
+                isVerified={ref.is_verified}
+                avatar={
+                  ref.profile?.avatar_url ||
+                  `https://ui-avatars.com/api/?name=${encodeURIComponent(ref.profile?.full_name || "A")}&background=1a1a2e&color=2ecc71&bold=true`
+                }
+              />
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );
