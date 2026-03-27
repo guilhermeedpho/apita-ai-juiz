@@ -137,11 +137,19 @@ const Profile = () => {
       toast({ title: "Selecione ao menos um tipo de campo", variant: "destructive" });
       return;
     }
-    const price = parseInt(pricePerMatch);
-    if (isNaN(price) || price < 0) {
-      toast({ title: "Preço inválido", variant: "destructive" });
-      return;
+
+    const numericPrices: Record<string, number> = {};
+    for (const ft of fieldTypes) {
+      const val = parseInt(pricesByField[ft] || "0");
+      if (isNaN(val) || val < 0) {
+        const label = FIELD_TYPE_OPTIONS.find((o) => o.value === ft)?.label || ft;
+        toast({ title: `Preço inválido para ${label}`, variant: "destructive" });
+        return;
+      }
+      numericPrices[ft] = val;
     }
+
+    const avgPrice = Math.round(Object.values(numericPrices).reduce((a, b) => a + b, 0) / fieldTypes.length);
 
     setSavingReferee(true);
 
