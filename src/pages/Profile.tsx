@@ -79,9 +79,14 @@ const Profile = () => {
 
       if (data) {
         setIsReferee(true);
-        setPricePerMatch(String(data.price_per_match));
         setFieldTypes(data.field_types || []);
         setRefereeRegion(data.region || "");
+        const prices = (data as any).prices_by_field as Record<string, number> | null;
+        if (prices) {
+          const mapped: Record<string, string> = {};
+          Object.entries(prices).forEach(([k, v]) => { mapped[k] = String(v); });
+          setPricesByField(mapped);
+        }
       }
     };
 
