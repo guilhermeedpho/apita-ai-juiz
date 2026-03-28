@@ -108,9 +108,15 @@ const PixPayment = ({ price, onConfirm, onCancel }: PixPaymentProps) => {
   return (
     <div className="space-y-4">
       <div className="rounded-lg bg-primary/10 border border-primary/30 p-4 text-center space-y-3">
-        <div className="flex items-center justify-center gap-2">
-          <QrCode className="h-5 w-5 text-primary" />
-          <p className="text-sm font-semibold text-primary">Pague via PIX</p>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <QrCode className="h-5 w-5 text-primary" />
+            <p className="text-sm font-semibold text-primary">Pague via PIX</p>
+          </div>
+          <div className={`flex items-center gap-1.5 ${timerColor} font-mono font-bold text-sm`}>
+            <Timer className="h-4 w-4" />
+            <span>{String(minutes).padStart(2, "0")}:{String(seconds).padStart(2, "0")}</span>
+          </div>
         </div>
 
         <div className="flex justify-center p-3 bg-background rounded-xl">
