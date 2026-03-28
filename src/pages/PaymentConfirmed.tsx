@@ -34,18 +34,8 @@ const PaymentConfirmed = () => {
       }
 
       try {
-        // Update match status to confirmed
-        await supabase
-          .from("matches" as any)
-          .update({
-            status: "confirmed",
-            payment_method: "infinitepay",
-            paid_at: new Date().toISOString(),
-          })
-          .eq("id", matchId)
-          .eq("requester_id", user.id);
-
-        // Fetch match details
+        // Only fetch match details - do NOT auto-confirm
+        // Payment confirmation is done manually by admin after verifying PIX
         const { data, error: fetchError } = await supabase
           .from("matches" as any)
           .select("*")
@@ -94,9 +84,9 @@ const PaymentConfirmed = () => {
               </div>
 
               <div>
-                <p className="text-lg font-semibold text-foreground">Pagamento confirmado! 🎉</p>
+                <p className="text-lg font-semibold text-foreground">Pagamento enviado! ⏳</p>
                 <p className="text-sm text-muted-foreground mt-1">
-                  Sua partida está confirmada.
+                  Seu pagamento está sendo verificado. A partida será confirmada assim que o admin aprovar o PIX.
                 </p>
               </div>
 
