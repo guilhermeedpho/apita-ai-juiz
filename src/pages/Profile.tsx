@@ -21,6 +21,13 @@ const FIXED_PRICES: Record<string, number> = {
   areia: 100,
 };
 
+const PRICE_TABLE: Record<string, Record<number, number>> = {
+  society: { 60: 130, 90: 180 },
+  campo: { 60: 200, 90: 280 },
+  futsal: { 60: 100, 90: 140 },
+  areia: { 60: 100, 90: 140 },
+};
+
 const FIELD_TYPE_OPTIONS = [
   { value: "society", label: "Society" },
   { value: "campo", label: "Campo (11x11)" },
