@@ -8,14 +8,19 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
-import { CalendarDays, MapPin } from "lucide-react";
+import { CalendarDays, MapPin, Clock } from "lucide-react";
 
-const FIXED_PRICES: Record<string, number> = {
-  society: 130,
-  campo: 200,
-  futsal: 100,
-  areia: 100,
+const PRICE_TABLE: Record<string, Record<number, number>> = {
+  society: { 60: 130, 90: 180 },
+  campo: { 60: 200, 90: 280 },
+  futsal: { 60: 100, 90: 140 },
+  areia: { 60: 100, 90: 140 },
 };
+
+const DURATION_OPTIONS = [
+  { value: 60, label: "60 minutos" },
+  { value: 90, label: "90 minutos" },
+];
 
 const FIELD_LABELS: Record<string, string> = {
   society: "Society",
@@ -35,20 +40,19 @@ const BookingDialog = ({ refereeId, refereeName, availableFieldTypes }: BookingD
   const { toast } = useToast();
   const [open, setOpen] = useState(false);
   const [fieldType, setFieldType] = useState("");
+  const [duration, setDuration] = useState<number>(60);
   const [location, setLocation] = useState("");
   const [scheduledAt, setScheduledAt] = useState("");
   const [notes, setNotes] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
-  const price = FIXED_PRICES[fieldType] || 0;
+  const price = PRICE_TABLE[fieldType]?.[duration] || 0;
   const platformFee = Math.round(price * 0.3);
   const refereePayout = price - platformFee;
 
   const playNotificationSound = () => {
     const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
-
-    // WhatsApp-like double tone
-    const playTone = (freq: number, startTime: number, duration: number) => {
+    const playTone = (freq: number, startTime: number, dur: number) => {
       const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
       osc.connect(gain);
@@ -56,11 +60,10 @@ const BookingDialog = ({ refereeId, refereeName, availableFieldTypes }: BookingD
       osc.frequency.value = freq;
       osc.type = "sine";
       gain.gain.setValueAtTime(0.3, startTime);
-      gain.gain.exponentialRampToValueAtTime(0.01, startTime + duration);
+      gain.gain.exponentialRampToValueAtTime(0.01, startTime + dur);
       osc.start(startTime);
-      osc.stop(startTime + duration);
+      osc.stop(startTime + dur);
     };
-
     const now = audioCtx.currentTime;
     playTone(880, now, 0.15);
     playTone(1175, now + 0.18, 0.15);
@@ -84,6 +87,7 @@ const BookingDialog = ({ refereeId, refereeName, availableFieldTypes }: BookingD
         referee_id: refereeId,
         requester_id: user.id,
         field_type: fieldType,
+        duration,
         location: location.trim(),
         scheduled_at: new Date(scheduledAt).toISOString(),
         price,
@@ -101,6 +105,7 @@ const BookingDialog = ({ refereeId, refereeName, availableFieldTypes }: BookingD
       toast({ title: "Partida agendada! 🎉", description: `${refereeName} foi escalado para sua partida.` });
       setOpen(false);
       setFieldType("");
+      setDuration(60);
       setLocation("");
       setScheduledAt("");
       setNotes("");
@@ -122,18 +127,45 @@ const BookingDialog = ({ refereeId, refereeName, availableFieldTypes }: BookingD
         <div className="space-y-4 pt-2">
           <div className="space-y-2">
             <Label>Tipo de campo *</Label>
-            <Select value={fieldType} onValueChange={setFieldType}>
+            <Select value={fieldType} onValueChange={(v) => { setFieldType(v); }}>
               <SelectTrigger>
                 <SelectValue placeholder="Selecione o tipo" />
               </SelectTrigger>
               <SelectContent>
                 {availableFieldTypes.map((ft) => (
                   <SelectItem key={ft} value={ft}>
-                    {FIELD_LABELS[ft] || ft} — R$ {FIXED_PRICES[ft]}
+                    {FIELD_LABELS[ft] || ft}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label className="flex items-center gap-1">
+              <Clock className="h-3.5 w-3.5" /> Tempo de jogo *
+            </Label>
+            <div className="grid grid-cols-2 gap-2">
+              {DURATION_OPTIONS.map((opt) => (
+                <button
+                  key={opt.value}
+                  type="button"
+                  onClick={() => setDuration(opt.value)}
+                  className={`rounded-lg border p-3 text-sm font-medium transition-colors ${
+                    duration === opt.value
+                      ? "border-primary bg-primary/10 text-primary"
+                      : "border-border hover:border-primary/50"
+                  }`}
+                >
+                  {opt.label}
+                  {fieldType && (
+                    <span className="block text-xs mt-1">
+                      R$ {PRICE_TABLE[fieldType]?.[opt.value] || "—"}
+                    </span>
+                  )}
+                </button>
+              ))}
+            </div>
           </div>
 
           <div className="space-y-2">
@@ -161,7 +193,7 @@ const BookingDialog = ({ refereeId, refereeName, availableFieldTypes }: BookingD
             <Textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              placeholder="Ex: Partida de campeonato, 2 tempos de 30min..."
+              placeholder="Ex: Partida de campeonato..."
               rows={2}
             />
           </div>
@@ -169,8 +201,16 @@ const BookingDialog = ({ refereeId, refereeName, availableFieldTypes }: BookingD
           {fieldType && (
             <div className="rounded-lg bg-secondary/50 p-3 text-sm space-y-1">
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Valor total</span>
-                <span className="font-semibold">R$ {price}</span>
+                <span className="text-muted-foreground">Modalidade</span>
+                <span>{FIELD_LABELS[fieldType]}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Duração</span>
+                <span>{duration} min</span>
+              </div>
+              <div className="flex justify-between font-semibold">
+                <span>Valor total</span>
+                <span>R$ {price}</span>
               </div>
             </div>
           )}
