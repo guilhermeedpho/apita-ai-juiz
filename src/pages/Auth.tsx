@@ -56,6 +56,14 @@ const Auth = () => {
     if (error) {
       toast({ title: "Erro ao cadastrar", description: error.message, variant: "destructive" });
     } else {
+      // If signing up as referee, assign role after signup
+      if (searchParams.get("modo") === "cadastro") {
+        const { data: { user: newUser } } = await supabase.auth.getUser();
+        if (newUser) {
+          await supabase.from("user_roles").insert({ user_id: newUser.id, role: "referee" as const });
+          await supabase.from("referees").upsert({ user_id: newUser.id }, { onConflict: "user_id" });
+        }
+      }
       toast({ title: "Cadastro realizado!" });
       navigate("/");
     }
