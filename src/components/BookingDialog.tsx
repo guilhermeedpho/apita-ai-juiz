@@ -114,14 +114,38 @@ const BookingDialog = ({ refereeId, refereeName, availableFieldTypes }: BookingD
     }
   };
 
+  const cancelMatch = async () => {
+    if (createdMatchId) {
+      await supabase
+        .from("matches" as any)
+        .delete()
+        .eq("id", createdMatchId);
+      toast({ title: "Partida cancelada", description: "O agendamento foi cancelado pois o pagamento não foi realizado." });
+    }
+  };
+
   const handleClose = () => {
     setOpen(false);
     setShowPixInfo(false);
+    setCreatedMatchId(null);
     setFieldType("");
     setDuration(60);
     setLocation("");
     setScheduledAt("");
     setNotes("");
+  };
+
+  const handleCancelPayment = async () => {
+    await cancelMatch();
+    handleClose();
+  };
+
+  const handleDialogChange = async (v: boolean) => {
+    if (!v && showPixInfo) {
+      await cancelMatch();
+    }
+    if (!v) handleClose();
+    else setOpen(true);
   };
 
   return (
