@@ -292,6 +292,58 @@ const Profile = () => {
       <div className="pt-24 pb-16 container mx-auto px-4 max-w-2xl space-y-6">
         <h1 className="text-4xl text-center">MEU PERFIL</h1>
 
+        {/* Avatar / Photo */}
+        <Card className="bg-gradient-card border-border shadow-card">
+          <CardContent className="pt-6 flex flex-col items-center gap-4">
+            <div className="relative">
+              <Avatar className="h-24 w-24">
+                {avatarUrl ? (
+                  <AvatarImage src={supabase.storage.from("avatars").getPublicUrl(avatarUrl).data.publicUrl} alt="Foto" />
+                ) : null}
+                <AvatarFallback className="text-2xl bg-muted">
+                  {fullName ? fullName.slice(0, 2).toUpperCase() : <Camera className="h-8 w-8" />}
+                </AvatarFallback>
+              </Avatar>
+              <label className="absolute -bottom-1 -right-1 bg-primary text-primary-foreground rounded-full p-1.5 cursor-pointer hover:opacity-80 transition-opacity">
+                <Camera className="h-4 w-4" />
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  className="hidden"
+                  disabled={uploadingAvatar}
+                  onChange={async (e) => {
+                    if (!user || !e.target.files?.[0]) return;
+                    const file = e.target.files[0];
+                    if (file.size > 3 * 1024 * 1024) {
+                      toast({ title: "Máximo 3MB", variant: "destructive" });
+                      return;
+                    }
+                    setUploadingAvatar(true);
+                    const ext = file.name.split(".").pop();
+                    const path = `${user.id}/avatar.${ext}`;
+                    const { error: upErr } = await supabase.storage.from("avatars").upload(path, file, { upsert: true });
+                    if (upErr) {
+                      toast({ title: "Erro no upload", description: upErr.message, variant: "destructive" });
+                      setUploadingAvatar(false);
+                      return;
+                    }
+                    await supabase.from("profiles").update({ avatar_url: path }).eq("user_id", user.id);
+                    setAvatarUrl(path);
+                    setUploadingAvatar(false);
+                    toast({ title: "Foto atualizada!" });
+                  }}
+                />
+              </label>
+            </div>
+            {!avatarUrl && (
+              <p className="text-sm text-destructive text-center font-medium">
+                ⚠️ Adicione uma foto com rosto limpo para completar seu perfil
+              </p>
+            )}
+            {uploadingAvatar && <p className="text-xs text-muted-foreground">Enviando...</p>}
+          </CardContent>
+        </Card>
+
         {/* Profile Info */}
         <Card className="bg-gradient-card border-border shadow-card">
           <CardHeader>

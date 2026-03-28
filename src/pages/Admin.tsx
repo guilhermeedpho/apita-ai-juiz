@@ -162,6 +162,9 @@ const Admin = () => {
         {/* Financial Dashboard */}
         <AdminFinancials />
 
+        {/* All Users */}
+        <AdminUsers />
+
         {/* Verification Filters */}
         <div className="flex gap-2 justify-center flex-wrap">
           {(["pending", "approved", "rejected", "all"] as const).map((f) => (
