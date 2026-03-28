@@ -89,8 +89,17 @@
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
+  .text-gradient-referee {
+    background: var(--gradient-referee);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
   .bg-gradient-hero {
     background: var(--gradient-hero);
+  }
+  .bg-gradient-referee-hero {
+    background: var(--gradient-referee-hero);
   }
   .bg-gradient-card {
     background: var(--gradient-card);
@@ -98,7 +107,25 @@
   .shadow-glow {
     box-shadow: var(--shadow-glow);
   }
+  .shadow-glow-referee {
+    box-shadow: 0 0 30px hsl(200 80% 50% / 0.15);
+  }
   .shadow-card {
     box-shadow: var(--shadow-card);
+  }
+  
+  /* Referee theme overrides */
+  .referee-theme {
+    --background: var(--referee-bg);
+    --card: var(--referee-card);
+    --card-foreground: var(--referee-card-foreground);
+    --primary: var(--referee-primary);
+    --primary-foreground: var(--referee-primary-foreground);
+    --accent: var(--referee-accent);
+    --muted: var(--referee-muted);
+    --muted-foreground: var(--referee-muted-foreground);
+    --border: var(--referee-border);
+    --input: var(--referee-border);
+    --ring: var(--referee-primary);
   }
 }

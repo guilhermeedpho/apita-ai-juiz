@@ -36,10 +36,10 @@ const Index = () => {
     );
   }
 
-  // Referee view: dashboard instead of search/hero
+  // Referee view: dashboard with distinct blue theme
   if (isReferee) {
     return (
-      <div className="min-h-screen" style={{ background: "hsl(var(--referee-bg))" }}>
+      <div className="min-h-screen referee-theme bg-background">
         <Navbar />
         <div className="pt-16">
           <RefereeDashboard />
