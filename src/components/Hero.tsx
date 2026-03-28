@@ -2,34 +2,11 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ShieldCheck } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/hooks/useAuth";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
 import heroImage from "@/assets/hero-referee.jpg";
 
 const Hero = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
-  const { toast } = useToast();
 
-  const handleWantToBeReferee = async () => {
-    if (!user) {
-      navigate("/auth?modo=cadastro");
-      return;
-    }
-    // User is logged in — register as referee
-    const { data: alreadyReferee } = await supabase.rpc("has_role", { _user_id: user.id, _role: "referee" as const });
-    if (alreadyReferee) {
-      toast({ title: "Você já é árbitro!" });
-      window.location.reload();
-      return;
-    }
-    // Insert referee role and referee profile
-    await supabase.from("user_roles").insert({ user_id: user.id, role: "referee" as const });
-    await supabase.from("referees").upsert({ user_id: user.id }, { onConflict: "user_id" });
-    toast({ title: "Você agora é árbitro! 🎉" });
-    window.location.reload();
-  };
   return (
     <section className="relative min-h-[90vh] flex items-center overflow-hidden">
       {/* Background image */}
@@ -61,7 +38,12 @@ const Hero = () => {
             ou crédito.
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
-            <Button variant="outline" size="lg" className="text-lg px-8 py-6 font-semibold border-border hover:bg-secondary" onClick={handleWantToBeReferee}>
+            <Button
+              variant="outline"
+              size="lg"
+              className="text-lg px-8 py-6 font-semibold border-border hover:bg-secondary"
+              onClick={() => navigate("/perfil?modo=arbitro")}
+            >
               <ShieldCheck className="mr-2 h-5 w-5" />
               Quero Ser Árbitro
             </Button>
