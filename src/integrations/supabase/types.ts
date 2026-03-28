@@ -47,6 +47,7 @@ export type Database = {
       matches: {
         Row: {
           created_at: string
+          duration: number
           field_type: string
           id: string
           location: string
@@ -61,6 +62,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          duration?: number
           field_type: string
           id?: string
           location: string
@@ -75,6 +77,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          duration?: number
           field_type?: string
           id?: string
           location?: string
@@ -179,7 +182,10 @@ export type Database = {
           id: string
           rating: number
           referee_id: string
+          referee_level: string | null
           reviewer_id: string
+          was_punctual: boolean | null
+          was_uniformed: boolean | null
         }
         Insert: {
           comment?: string | null
@@ -187,7 +193,10 @@ export type Database = {
           id?: string
           rating: number
           referee_id: string
+          referee_level?: string | null
           reviewer_id: string
+          was_punctual?: boolean | null
+          was_uniformed?: boolean | null
         }
         Update: {
           comment?: string | null
@@ -195,7 +204,10 @@ export type Database = {
           id?: string
           rating?: number
           referee_id?: string
+          referee_level?: string | null
           reviewer_id?: string
+          was_punctual?: boolean | null
+          was_uniformed?: boolean | null
         }
         Relationships: []
       }
