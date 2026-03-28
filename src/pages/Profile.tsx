@@ -303,12 +303,16 @@ const Profile = () => {
         <Card className="bg-gradient-card border-border shadow-card">
           <CardContent className="pt-6 flex flex-col items-center gap-4">
             <div className="relative">
-              <Avatar className="h-24 w-24">
+              <Avatar className="h-28 w-28 sm:h-32 sm:w-32 ring-2 ring-primary/30">
                 {avatarUrl ? (
-                  <AvatarImage src={supabase.storage.from("avatars").getPublicUrl(avatarUrl).data.publicUrl} alt="Foto" />
+                  <AvatarImage
+                    src={supabase.storage.from("avatars").getPublicUrl(avatarUrl).data.publicUrl}
+                    alt="Foto"
+                    className="object-cover"
+                  />
                 ) : null}
-                <AvatarFallback className="text-2xl bg-muted">
-                  {fullName ? fullName.slice(0, 2).toUpperCase() : <Camera className="h-8 w-8" />}
+                <AvatarFallback className="text-3xl bg-muted">
+                  {fullName ? fullName.slice(0, 2).toUpperCase() : <Camera className="h-10 w-10" />}
                 </AvatarFallback>
               </Avatar>
               <label className="absolute -bottom-1 -right-1 bg-primary text-primary-foreground rounded-full p-1.5 cursor-pointer hover:opacity-80 transition-opacity">

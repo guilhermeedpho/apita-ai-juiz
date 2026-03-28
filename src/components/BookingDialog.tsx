@@ -11,15 +11,16 @@ import { supabase } from "@/integrations/supabase/client";
 import { CalendarDays, MapPin, Clock } from "lucide-react";
 
 const PRICE_TABLE: Record<string, Record<number, number>> = {
-  society: { 60: 130, 90: 180 },
+  society: { 60: 130, 90: 180, 120: 220 },
   campo: { 60: 200, 90: 280 },
-  futsal: { 60: 100, 90: 140 },
-  areia: { 60: 100, 90: 140 },
+  futsal: { 60: 100, 90: 140, 120: 170 },
+  areia: { 60: 100, 90: 140, 120: 170 },
 };
 
 const DURATION_OPTIONS = [
   { value: 60, label: "60 minutos" },
   { value: 90, label: "90 minutos" },
+  { value: 120, label: "120 minutos" },
 ];
 
 const FIELD_LABELS: Record<string, string> = {

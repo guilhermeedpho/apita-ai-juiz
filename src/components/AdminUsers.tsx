@@ -84,9 +84,9 @@ const AdminUsers = () => {
           {filtered.map((u) => (
             <Card key={u.id} className="bg-gradient-card border-border shadow-card">
               <CardContent className="py-3 px-4 flex items-center gap-3">
-                <Avatar className="h-10 w-10">
+                <Avatar className="h-11 w-11 ring-1 ring-border">
                   {u.avatar_url ? (
-                    <AvatarImage src={getAvatarUrl(u.avatar_url) || ""} alt={u.full_name} />
+                    <AvatarImage src={getAvatarUrl(u.avatar_url) || ""} alt={u.full_name} className="object-cover" />
                   ) : null}
                   <AvatarFallback className="text-xs bg-muted">
                     {u.full_name.slice(0, 2).toUpperCase()}
