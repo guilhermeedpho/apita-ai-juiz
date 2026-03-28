@@ -219,6 +219,7 @@ const Profile = () => {
         // Add referee role
         await supabase.from("user_roles").insert({ user_id: user.id, role: "referee" as const });
         setIsReferee(true);
+        setShowRefereeSuccess(true);
         toast({ title: "Cadastro como árbitro realizado!", description: "Agora você aparece na lista de árbitros." });
       } else {
         toast({ title: "Erro ao cadastrar", description: error.message, variant: "destructive" });
