@@ -14,6 +14,8 @@ import { useToast } from "@/hooks/use-toast";
 import { Upload, CheckCircle, Clock, XCircle, User, Phone, MapPin, FileText, Shield, DollarSign, Camera } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import MyMatches from "@/components/MyMatches";
+import DeleteAccountDialog from "@/components/DeleteAccountDialog";
+import ContactAdminDialog from "@/components/ContactAdminDialog";
 
 const FIXED_PRICES: Record<string, number> = {
   society: 130,
