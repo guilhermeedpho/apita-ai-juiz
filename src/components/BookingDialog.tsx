@@ -9,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { CalendarDays, MapPin, Clock } from "lucide-react";
+import PixPayment from "./PixPayment";
 
 const PRICE_TABLE: Record<string, Record<number, number>> = {
   society: { 60: 130, 90: 180, 120: 220 },
