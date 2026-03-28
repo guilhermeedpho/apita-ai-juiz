@@ -11,6 +11,8 @@ import { useToast } from "@/hooks/use-toast";
 import { ShieldCheck, FileText, CheckCircle, XCircle, Eye, Clock } from "lucide-react";
 import AdminFinancials from "@/components/AdminFinancials";
 import AdminUsers from "@/components/AdminUsers";
+import AdminSupportMessages from "@/components/AdminSupportMessages";
+import AdminMatchesManager from "@/components/AdminMatchesManager";
 
 interface Verification {
   id: string;
@@ -164,6 +166,12 @@ const Admin = () => {
 
         {/* All Users */}
         <AdminUsers />
+
+        {/* Support Messages */}
+        <AdminSupportMessages />
+
+        {/* Matches Manager */}
+        <AdminMatchesManager />
 
         {/* Verification Filters */}
         <div className="flex gap-2 justify-center flex-wrap">

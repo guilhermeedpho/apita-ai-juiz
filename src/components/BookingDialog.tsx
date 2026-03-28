@@ -46,6 +46,7 @@ const BookingDialog = ({ refereeId, refereeName, availableFieldTypes }: BookingD
   const [scheduledAt, setScheduledAt] = useState("");
   const [notes, setNotes] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [showPixInfo, setShowPixInfo] = useState(false);
 
   const price = PRICE_TABLE[fieldType]?.[duration] || 0;
   const platformFee = Math.round(price * 0.3);
@@ -104,17 +105,23 @@ const BookingDialog = ({ refereeId, refereeName, availableFieldTypes }: BookingD
     } else {
       playNotificationSound();
       toast({ title: "Partida agendada! 🎉", description: `${refereeName} foi escalado para sua partida.` });
-      setOpen(false);
-      setFieldType("");
-      setDuration(60);
-      setLocation("");
-      setScheduledAt("");
-      setNotes("");
+      setShowPixInfo(true);
     }
   };
 
+  const handleClose = () => {
+    setOpen(false);
+    setShowPixInfo(false);
+    setFieldType("");
+    setDuration(60);
+    setLocation("");
+    setScheduledAt("");
+    setNotes("");
+  };
+  };
+
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={(v) => { if (!v) handleClose(); else setOpen(true); }}>
       <DialogTrigger asChild>
         <Button size="sm" className="font-semibold">
           <CalendarDays className="h-4 w-4 mr-1" />
@@ -216,9 +223,29 @@ const BookingDialog = ({ refereeId, refereeName, availableFieldTypes }: BookingD
             </div>
           )}
 
-          <Button onClick={handleSubmit} disabled={submitting} className="w-full font-semibold">
-            {submitting ? "Agendando..." : "Confirmar agendamento"}
-          </Button>
+          {showPixInfo ? (
+            <div className="space-y-4">
+              <div className="rounded-lg bg-primary/10 border border-primary/30 p-4 space-y-2">
+                <p className="text-sm font-semibold text-primary">✅ Agendamento confirmado!</p>
+                <p className="text-sm text-muted-foreground">Realize o pagamento via PIX para confirmar:</p>
+                <div className="bg-background rounded-lg p-3 space-y-1 text-sm">
+                  <p><span className="text-muted-foreground">Chave PIX:</span> <strong className="select-all">apitaja@email.com</strong></p>
+                  <p><span className="text-muted-foreground">Titular:</span> <strong>APITAJÁ LTDA</strong></p>
+                  <p><span className="text-muted-foreground">Valor:</span> <strong className="text-primary">R$ {price}</strong></p>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Envie o comprovante pelo chat da partida no seu perfil.
+                </p>
+              </div>
+              <Button onClick={handleClose} className="w-full font-semibold">
+                Entendido
+              </Button>
+            </div>
+          ) : (
+            <Button onClick={handleSubmit} disabled={submitting} className="w-full font-semibold">
+              {submitting ? "Agendando..." : "Confirmar agendamento"}
+            </Button>
+          )}
         </div>
       </DialogContent>
     </Dialog>
