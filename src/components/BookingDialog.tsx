@@ -9,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { CalendarDays, MapPin, Clock } from "lucide-react";
+import PixPayment from "./PixPayment";
 
 const PRICE_TABLE: Record<string, Record<number, number>> = {
   society: { 60: 130, 90: 180, 120: 220 },
@@ -223,23 +224,7 @@ const BookingDialog = ({ refereeId, refereeName, availableFieldTypes }: BookingD
           )}
 
           {showPixInfo ? (
-            <div className="space-y-4">
-              <div className="rounded-lg bg-primary/10 border border-primary/30 p-4 space-y-2">
-                <p className="text-sm font-semibold text-primary">✅ Agendamento confirmado!</p>
-                <p className="text-sm text-muted-foreground">Realize o pagamento via PIX para confirmar:</p>
-                <div className="bg-background rounded-lg p-3 space-y-1 text-sm">
-                  <p><span className="text-muted-foreground">Chave PIX (CNPJ):</span> <strong className="select-all">58722776000103</strong></p>
-                  <p><span className="text-muted-foreground">Titular:</span> <strong>APITAJÁ LTDA</strong></p>
-                  <p><span className="text-muted-foreground">Valor:</span> <strong className="text-primary">R$ {price}</strong></p>
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  Envie o comprovante pelo chat da partida no seu perfil.
-                </p>
-              </div>
-              <Button onClick={handleClose} className="w-full font-semibold">
-                Entendido
-              </Button>
-            </div>
+            <PixPayment price={price} onConfirm={handleClose} />
           ) : (
             <Button onClick={handleSubmit} disabled={submitting} className="w-full font-semibold">
               {submitting ? "Agendando..." : "Confirmar agendamento"}
