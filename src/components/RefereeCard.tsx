@@ -47,8 +47,8 @@ const RefereeCard = ({
     >
       <div className="p-6">
         <div className="flex items-start gap-4 mb-4">
-          <div className="w-14 h-14 rounded-xl bg-secondary overflow-hidden flex-shrink-0">
-            <img src={avatar} alt={name} className="w-full h-full object-cover" />
+          <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl bg-secondary overflow-hidden flex-shrink-0 ring-1 ring-border">
+            <img src={avatar} alt={name} className="w-full h-full object-cover object-center" />
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-1.5">
