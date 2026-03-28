@@ -149,7 +149,7 @@ const BookingDialog = ({ refereeId, refereeName, availableFieldTypes }: BookingD
   };
 
   return (
-    <Dialog open={open} onOpenChange={(v) => { if (!v) handleClose(); else setOpen(true); }}>
+    <Dialog open={open} onOpenChange={handleDialogChange}>
       <DialogTrigger asChild>
         <Button size="sm" className="font-semibold">
           <CalendarDays className="h-4 w-4 mr-1" />
