@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import QRCode from "react-qr-code";
 import { Button } from "@/components/ui/button";
 import { Check, Copy, QrCode, CreditCard, XCircle, Timer } from "lucide-react";
@@ -6,12 +6,11 @@ import { useToast } from "@/hooks/use-toast";
 
 const PIX_KEY = "58722776000103";
 const PIX_NAME = "APITAJÁ LTDA";
-const EXPIRATION_SECONDS = 10 * 60; // 10 minutes
+const EXPIRATION_SECONDS = 10 * 60;
 
 function generatePixPayload(amount: number): string {
-  const formatField = (id: string, value: string) => {
-    return `${id}${String(value.length).padStart(2, "0")}${value}`;
-  };
+  const formatField = (id: string, value: string) =>
+    `${id}${String(value.length).padStart(2, "0")}${value}`;
 
   const merchantAccount =
     formatField("00", "br.gov.bcb.pix") + formatField("01", PIX_KEY);
@@ -30,7 +29,6 @@ function generatePixPayload(amount: number): string {
 
   const crc = crc16(payload);
   payload += crc.toUpperCase();
-
   return payload;
 }
 
@@ -60,46 +58,53 @@ const PixPayment = ({ price, onConfirm, onCancel }: PixPaymentProps) => {
   const { toast } = useToast();
   const [copied, setCopied] = useState(false);
   const [secondsLeft, setSecondsLeft] = useState(EXPIRATION_SECONDS);
+  const onCancelRef = useRef(onCancel);
+  onCancelRef.current = onCancel;
+
   const pixPayload = generatePixPayload(price);
 
-  const expired = secondsLeft <= 0;
-
-  const handleExpire = useCallback(() => {
-    toast({
-      title: "Tempo expirado ⏰",
-      description: "O pagamento PIX expirou. A partida foi cancelada automaticamente.",
-      variant: "destructive",
-    });
-    onCancel();
-  }, [onCancel, toast]);
-
+  // Timer countdown - stable effect, no dependency issues
   useEffect(() => {
-    if (expired) {
-      handleExpire();
-      return;
-    }
     const interval = setInterval(() => {
       setSecondsLeft((prev) => {
         if (prev <= 1) {
           clearInterval(interval);
+          // Schedule cancel on next tick to avoid state updates during render
+          setTimeout(() => {
+            onCancelRef.current();
+          }, 0);
           return 0;
         }
         return prev - 1;
       });
     }, 1000);
     return () => clearInterval(interval);
-  }, [expired, handleExpire]);
+  }, []);
 
   const minutes = Math.floor(secondsLeft / 60);
   const seconds = secondsLeft % 60;
-  const timerColor = secondsLeft <= 60 ? "text-destructive" : secondsLeft <= 180 ? "text-accent" : "text-primary";
+  const timerColor =
+    secondsLeft <= 60
+      ? "text-destructive"
+      : secondsLeft <= 180
+      ? "text-accent"
+      : "text-primary";
 
-  const handleCopy = async () => {
+  const handleCopyPayload = async () => {
     try {
       await navigator.clipboard.writeText(pixPayload);
       setCopied(true);
-      toast({ title: "Código PIX copiado!" });
+      toast({ title: "Código PIX copiado! ✅" });
       setTimeout(() => setCopied(false), 3000);
+    } catch {
+      toast({ title: "Erro ao copiar", variant: "destructive" });
+    }
+  };
+
+  const handleCopyKey = async () => {
+    try {
+      await navigator.clipboard.writeText(PIX_KEY);
+      toast({ title: "Chave PIX copiada! ✅" });
     } catch {
       toast({ title: "Erro ao copiar", variant: "destructive" });
     }
@@ -115,7 +120,9 @@ const PixPayment = ({ price, onConfirm, onCancel }: PixPaymentProps) => {
           </div>
           <div className={`flex items-center gap-1.5 ${timerColor} font-mono font-bold text-sm`}>
             <Timer className="h-4 w-4" />
-            <span>{String(minutes).padStart(2, "0")}:{String(seconds).padStart(2, "0")}</span>
+            <span>
+              {String(minutes).padStart(2, "0")}:{String(seconds).padStart(2, "0")}
+            </span>
           </div>
         </div>
 
@@ -132,9 +139,16 @@ const PixPayment = ({ price, onConfirm, onCancel }: PixPaymentProps) => {
             <span className="text-muted-foreground">Titular:</span>
             <strong>{PIX_NAME}</strong>
           </div>
-          <div className="flex justify-between items-center">
+          <div className="flex justify-between items-center gap-2">
             <span className="text-muted-foreground">Chave (CNPJ):</span>
-            <strong className="font-mono text-xs">{PIX_KEY}</strong>
+            <button
+              onClick={handleCopyKey}
+              className="flex items-center gap-1 font-mono text-xs font-bold hover:text-primary transition-colors"
+              title="Copiar chave"
+            >
+              {PIX_KEY}
+              <Copy className="h-3 w-3" />
+            </button>
           </div>
           <div className="flex justify-between items-center">
             <span className="text-muted-foreground">Valor:</span>
@@ -142,11 +156,7 @@ const PixPayment = ({ price, onConfirm, onCancel }: PixPaymentProps) => {
           </div>
         </div>
 
-        <Button
-          variant="outline"
-          onClick={handleCopy}
-          className="w-full gap-2"
-        >
+        <Button variant="outline" onClick={handleCopyPayload} className="w-full gap-2">
           {copied ? (
             <>
               <Check className="h-4 w-4" /> Copiado!
@@ -160,7 +170,11 @@ const PixPayment = ({ price, onConfirm, onCancel }: PixPaymentProps) => {
       </div>
 
       <div className="grid grid-cols-2 gap-2">
-        <Button variant="outline" onClick={onCancel} className="font-semibold gap-2 text-destructive border-destructive/30 hover:bg-destructive/10">
+        <Button
+          variant="outline"
+          onClick={onCancel}
+          className="font-semibold gap-2 text-destructive border-destructive/30 hover:bg-destructive/10"
+        >
           <XCircle className="h-4 w-4" />
           Cancelar
         </Button>
