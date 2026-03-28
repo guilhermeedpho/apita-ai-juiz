@@ -590,6 +590,9 @@ const Profile = () => {
             )}
           </CardContent>
         </Card>
+
+        {/* My Matches with Chat */}
+        <MyMatches />
       </div>
       <Footer />
     </div>
