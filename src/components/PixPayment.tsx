@@ -1,7 +1,7 @@
 import { useState } from "react";
 import QRCode from "react-qr-code";
 import { Button } from "@/components/ui/button";
-import { Check, Copy, QrCode, CreditCard } from "lucide-react";
+import { Check, Copy, QrCode, CreditCard, XCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const PIX_KEY = "58722776000103";
