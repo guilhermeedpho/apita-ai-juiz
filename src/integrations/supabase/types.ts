@@ -52,6 +52,9 @@ export type Database = {
           id: string
           location: string
           notes: string | null
+          paid_at: string | null
+          payment_method: string | null
+          payment_nsu: string | null
           platform_fee: number
           price: number
           referee_id: string
@@ -67,6 +70,9 @@ export type Database = {
           id?: string
           location: string
           notes?: string | null
+          paid_at?: string | null
+          payment_method?: string | null
+          payment_nsu?: string | null
           platform_fee: number
           price: number
           referee_id: string
@@ -82,6 +88,9 @@ export type Database = {
           id?: string
           location?: string
           notes?: string | null
+          paid_at?: string | null
+          payment_method?: string | null
+          payment_nsu?: string | null
           platform_fee?: number
           price?: number
           referee_id?: string
