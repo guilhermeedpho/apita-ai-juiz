@@ -39,7 +39,7 @@ const Index = () => {
   // Referee view: dashboard instead of search/hero
   if (isReferee) {
     return (
-      <div className="min-h-screen bg-[hsl(200,25%,8%)]">
+      <div className="min-h-screen" style={{ background: "hsl(var(--referee-bg))" }}>
         <Navbar />
         <div className="pt-16">
           <RefereeDashboard />
