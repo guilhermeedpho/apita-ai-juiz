@@ -1,7 +1,7 @@
 import { useState } from "react";
 import QRCode from "react-qr-code";
 import { Button } from "@/components/ui/button";
-import { Check, Copy, QrCode, CreditCard } from "lucide-react";
+import { Check, Copy, QrCode, CreditCard, XCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const PIX_KEY = "58722776000103";
@@ -53,9 +53,10 @@ function crc16(str: string): string {
 interface PixPaymentProps {
   price: number;
   onConfirm: () => void;
+  onCancel: () => void;
 }
 
-const PixPayment = ({ price, onConfirm }: PixPaymentProps) => {
+const PixPayment = ({ price, onConfirm, onCancel }: PixPaymentProps) => {
   const { toast } = useToast();
   const [copied, setCopied] = useState(false);
   const pixPayload = generatePixPayload(price);
@@ -119,14 +120,16 @@ const PixPayment = ({ price, onConfirm }: PixPaymentProps) => {
         </Button>
       </div>
 
-      <Button onClick={onConfirm} className="w-full font-semibold gap-2">
-        <CreditCard className="h-4 w-4" />
-        Já realizei o pagamento
-      </Button>
-
-      <p className="text-xs text-center text-muted-foreground">
-        Envie o comprovante pelo chat da partida no seu perfil para confirmar.
-      </p>
+      <div className="grid grid-cols-2 gap-2">
+        <Button variant="outline" onClick={onCancel} className="font-semibold gap-2 text-destructive border-destructive/30 hover:bg-destructive/10">
+          <XCircle className="h-4 w-4" />
+          Cancelar
+        </Button>
+        <Button onClick={onConfirm} className="font-semibold gap-2">
+          <CreditCard className="h-4 w-4" />
+          Já paguei
+        </Button>
+      </div>
     </div>
   );
 };

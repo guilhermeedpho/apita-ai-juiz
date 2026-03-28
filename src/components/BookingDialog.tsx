@@ -48,6 +48,7 @@ const BookingDialog = ({ refereeId, refereeName, availableFieldTypes }: BookingD
   const [notes, setNotes] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [showPixInfo, setShowPixInfo] = useState(false);
+  const [createdMatchId, setCreatedMatchId] = useState<string | null>(null);
 
   const price = PRICE_TABLE[fieldType]?.[duration] || 0;
   const platformFee = Math.round(price * 0.3);
@@ -84,7 +85,7 @@ const BookingDialog = ({ refereeId, refereeName, availableFieldTypes }: BookingD
 
     setSubmitting(true);
 
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from("matches" as any)
       .insert({
         referee_id: refereeId,
@@ -97,22 +98,36 @@ const BookingDialog = ({ refereeId, refereeName, availableFieldTypes }: BookingD
         platform_fee: platformFee,
         referee_payout: refereePayout,
         notes: notes.trim() || null,
-      });
+      })
+      .select("id")
+      .single();
 
     setSubmitting(false);
 
     if (error) {
       toast({ title: "Erro ao agendar", description: error.message, variant: "destructive" });
     } else {
+      setCreatedMatchId((data as any)?.id || null);
       playNotificationSound();
       toast({ title: "Partida agendada! 🎉", description: `${refereeName} foi escalado para sua partida.` });
       setShowPixInfo(true);
     }
   };
 
+  const cancelMatch = async () => {
+    if (createdMatchId) {
+      await supabase
+        .from("matches" as any)
+        .delete()
+        .eq("id", createdMatchId);
+      toast({ title: "Partida cancelada", description: "O agendamento foi cancelado pois o pagamento não foi realizado." });
+    }
+  };
+
   const handleClose = () => {
     setOpen(false);
     setShowPixInfo(false);
+    setCreatedMatchId(null);
     setFieldType("");
     setDuration(60);
     setLocation("");
@@ -120,8 +135,21 @@ const BookingDialog = ({ refereeId, refereeName, availableFieldTypes }: BookingD
     setNotes("");
   };
 
+  const handleCancelPayment = async () => {
+    await cancelMatch();
+    handleClose();
+  };
+
+  const handleDialogChange = async (v: boolean) => {
+    if (!v && showPixInfo) {
+      await cancelMatch();
+    }
+    if (!v) handleClose();
+    else setOpen(true);
+  };
+
   return (
-    <Dialog open={open} onOpenChange={(v) => { if (!v) handleClose(); else setOpen(true); }}>
+    <Dialog open={open} onOpenChange={handleDialogChange}>
       <DialogTrigger asChild>
         <Button size="sm" className="font-semibold">
           <CalendarDays className="h-4 w-4 mr-1" />
@@ -224,7 +252,7 @@ const BookingDialog = ({ refereeId, refereeName, availableFieldTypes }: BookingD
           )}
 
           {showPixInfo ? (
-            <PixPayment price={price} onConfirm={handleClose} />
+            <PixPayment price={price} onConfirm={handleClose} onCancel={handleCancelPayment} />
           ) : (
             <Button onClick={handleSubmit} disabled={submitting} className="w-full font-semibold">
               {submitting ? "Agendando..." : "Confirmar agendamento"}
