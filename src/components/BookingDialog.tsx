@@ -46,6 +46,7 @@ const BookingDialog = ({ refereeId, refereeName, availableFieldTypes }: BookingD
   const [scheduledAt, setScheduledAt] = useState("");
   const [notes, setNotes] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [showPixInfo, setShowPixInfo] = useState(false);
 
   const price = PRICE_TABLE[fieldType]?.[duration] || 0;
   const platformFee = Math.round(price * 0.3);
