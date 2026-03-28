@@ -9,6 +9,8 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { CalendarDays, MapPin, Clock } from "lucide-react";
+import { CheckCircle2, PartyPopper } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import PixPayment from "./PixPayment";
 
 const PRICE_TABLE: Record<string, Record<number, number>> = {
@@ -37,9 +39,12 @@ interface BookingDialogProps {
   availableFieldTypes: string[];
 }
 
+type DialogStep = "form" | "payment" | "success";
+
 const BookingDialog = ({ refereeId, refereeName, availableFieldTypes }: BookingDialogProps) => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [fieldType, setFieldType] = useState("");
   const [duration, setDuration] = useState<number>(60);
@@ -47,9 +52,13 @@ const BookingDialog = ({ refereeId, refereeName, availableFieldTypes }: BookingD
   const [scheduledAt, setScheduledAt] = useState("");
   const [notes, setNotes] = useState("");
   const [submitting, setSubmitting] = useState(false);
-  const [showPixInfo, setShowPixInfo] = useState(false);
+  const [step, setStep] = useState<DialogStep>("form");
   const [createdMatchId, setCreatedMatchId] = useState<string | null>(null);
-  const [paymentConfirmed, setPaymentConfirmed] = useState(false);
+  const [confirmedScheduledAt, setConfirmedScheduledAt] = useState("");
+  const [confirmedLocation, setConfirmedLocation] = useState("");
+  const [confirmedFieldType, setConfirmedFieldType] = useState("");
+  const [confirmedDuration, setConfirmedDuration] = useState(0);
+  const [confirmedPrice, setConfirmedPrice] = useState(0);
 
   const price = PRICE_TABLE[fieldType]?.[duration] || 0;
   const platformFee = Math.round(price * 0.3);
@@ -108,11 +117,15 @@ const BookingDialog = ({ refereeId, refereeName, availableFieldTypes }: BookingD
     if (error) {
       toast({ title: "Erro ao agendar", description: error.message, variant: "destructive" });
     } else {
-      setPaymentConfirmed(false);
       setCreatedMatchId((data as any)?.id || null);
+      setConfirmedScheduledAt(new Date(scheduledAt).toLocaleString("pt-BR"));
+      setConfirmedLocation(location.trim());
+      setConfirmedFieldType(fieldType);
+      setConfirmedDuration(duration);
+      setConfirmedPrice(price);
       playNotificationSound();
       toast({ title: "Partida agendada! 🎉", description: `${refereeName} foi escalado para sua partida.` });
-      setShowPixInfo(true);
+      setStep("payment");
     }
   };
 
@@ -146,16 +159,15 @@ const BookingDialog = ({ refereeId, refereeName, availableFieldTypes }: BookingD
       throw error;
     }
 
-    setPaymentConfirmed(true);
     toast({ title: "Pagamento confirmado! ✅", description: "Sua marcação foi liberada com sucesso." });
-    handleClose();
+    playNotificationSound();
+    setStep("success");
   };
 
   const handleClose = () => {
     setOpen(false);
-    setShowPixInfo(false);
+    setStep("form");
     setCreatedMatchId(null);
-    setPaymentConfirmed(false);
     setFieldType("");
     setDuration(60);
     setLocation("");
@@ -170,7 +182,7 @@ const BookingDialog = ({ refereeId, refereeName, availableFieldTypes }: BookingD
 
   const handleDialogChange = (v: boolean) => {
     if (!v) {
-      if (showPixInfo && !paymentConfirmed) {
+      if (step === "payment") {
         void cancelMatch();
       }
       handleClose();
@@ -178,6 +190,11 @@ const BookingDialog = ({ refereeId, refereeName, availableFieldTypes }: BookingD
     }
 
     setOpen(true);
+  };
+
+  const goToMyMatches = () => {
+    handleClose();
+    navigate("/perfil");
   };
 
   return (
@@ -190,11 +207,69 @@ const BookingDialog = ({ refereeId, refereeName, availableFieldTypes }: BookingD
       </DialogTrigger>
       <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Agendar {refereeName}</DialogTitle>
+          <DialogTitle>
+            {step === "success" ? "Partida Confirmada! 🎉" : `Agendar ${refereeName}`}
+          </DialogTitle>
         </DialogHeader>
-        {showPixInfo ? (
+
+        {step === "success" ? (
+          <div className="pt-2 space-y-5 text-center">
+            <div className="flex justify-center">
+              <div className="relative">
+                <div className="h-20 w-20 rounded-full bg-primary/15 flex items-center justify-center mx-auto">
+                  <CheckCircle2 className="h-10 w-10 text-primary" />
+                </div>
+                <PartyPopper className="h-6 w-6 text-accent absolute -top-1 -right-1 animate-bounce" />
+              </div>
+            </div>
+
+            <div>
+              <p className="text-lg font-semibold text-foreground">Pagamento confirmado!</p>
+              <p className="text-sm text-muted-foreground mt-1">
+                Sua partida com <strong>{refereeName}</strong> está confirmada.
+              </p>
+            </div>
+
+            <div className="rounded-lg bg-secondary/50 p-4 text-sm space-y-2 text-left">
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Árbitro</span>
+                <strong>{refereeName}</strong>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Modalidade</span>
+                <span>{FIELD_LABELS[confirmedFieldType] || confirmedFieldType}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Duração</span>
+                <span>{confirmedDuration} min</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground flex items-center gap-1"><MapPin className="h-3.5 w-3.5" /> Local</span>
+                <span className="text-right max-w-[60%]">{confirmedLocation}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground flex items-center gap-1"><CalendarDays className="h-3.5 w-3.5" /> Data</span>
+                <span>{confirmedScheduledAt}</span>
+              </div>
+              <div className="flex justify-between font-semibold border-t border-border pt-2 mt-1">
+                <span>Valor pago</span>
+                <span className="text-primary">R$ {confirmedPrice}</span>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Button onClick={goToMyMatches} className="w-full font-semibold gap-2">
+                <CalendarDays className="h-4 w-4" />
+                Ver minhas partidas
+              </Button>
+              <Button variant="outline" onClick={handleClose} className="w-full font-semibold">
+                Fechar
+              </Button>
+            </div>
+          </div>
+        ) : step === "payment" ? (
           <div className="pt-2">
-            <PixPayment price={price} onConfirm={confirmPayment} onCancel={handleCancelPayment} />
+            <PixPayment price={confirmedPrice} onConfirm={confirmPayment} onCancel={handleCancelPayment} />
           </div>
         ) : (
           <div className="space-y-4 pt-2">
