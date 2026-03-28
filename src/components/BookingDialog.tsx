@@ -228,7 +228,7 @@ const BookingDialog = ({ refereeId, refereeName, availableFieldTypes }: BookingD
                 <p className="text-sm font-semibold text-primary">✅ Agendamento confirmado!</p>
                 <p className="text-sm text-muted-foreground">Realize o pagamento via PIX para confirmar:</p>
                 <div className="bg-background rounded-lg p-3 space-y-1 text-sm">
-                  <p><span className="text-muted-foreground">Chave PIX:</span> <strong className="select-all">apitaja@email.com</strong></p>
+                  <p><span className="text-muted-foreground">Chave PIX (CNPJ):</span> <strong className="select-all">58722776000103</strong></p>
                   <p><span className="text-muted-foreground">Titular:</span> <strong>APITAJÁ LTDA</strong></p>
                   <p><span className="text-muted-foreground">Valor:</span> <strong className="text-primary">R$ {price}</strong></p>
                 </div>

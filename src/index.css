@@ -53,6 +53,8 @@
     --gradient-card: linear-gradient(145deg, hsl(220, 18%, 13%), hsl(220, 18%, 9%));
     --shadow-glow: 0 0 30px hsl(145 70% 45% / 0.15);
     --shadow-card: 0 8px 32px hsl(0 0% 0% / 0.3);
+    --referee-bg: 200 25% 8%;
+
   }
 }
 
