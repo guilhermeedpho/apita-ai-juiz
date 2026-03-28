@@ -57,6 +57,8 @@ const Profile = () => {
   const [competitionLevels, setCompetitionLevels] = useState<string[]>([]);
   const [savingReferee, setSavingReferee] = useState(false);
   const [refereeError, setRefereeError] = useState<string | null>(null);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
 
   useEffect(() => {
     if (!authLoading && !user) {
