@@ -120,14 +120,16 @@ const PixPayment = ({ price, onConfirm, onCancel }: PixPaymentProps) => {
         </Button>
       </div>
 
-      <Button onClick={onConfirm} className="w-full font-semibold gap-2">
-        <CreditCard className="h-4 w-4" />
-        Já realizei o pagamento
-      </Button>
-
-      <p className="text-xs text-center text-muted-foreground">
-        Envie o comprovante pelo chat da partida no seu perfil para confirmar.
-      </p>
+      <div className="grid grid-cols-2 gap-2">
+        <Button variant="outline" onClick={onCancel} className="font-semibold gap-2 text-destructive border-destructive/30 hover:bg-destructive/10">
+          <XCircle className="h-4 w-4" />
+          Cancelar
+        </Button>
+        <Button onClick={onConfirm} className="font-semibold gap-2">
+          <CreditCard className="h-4 w-4" />
+          Já paguei
+        </Button>
+      </div>
     </div>
   );
 };
