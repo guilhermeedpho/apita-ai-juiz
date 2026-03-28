@@ -8,10 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
-import { CalendarDays, MapPin, Clock } from "lucide-react";
-import { CheckCircle2, PartyPopper } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-import PixPayment from "./PixPayment";
+import { CalendarDays, MapPin, Clock, Loader2, ExternalLink } from "lucide-react";
 
 const PRICE_TABLE: Record<string, Record<number, number>> = {
   society: { 60: 130, 90: 180, 120: 220 },
