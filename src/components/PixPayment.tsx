@@ -53,9 +53,10 @@ function crc16(str: string): string {
 interface PixPaymentProps {
   price: number;
   onConfirm: () => void;
+  onCancel: () => void;
 }
 
-const PixPayment = ({ price, onConfirm }: PixPaymentProps) => {
+const PixPayment = ({ price, onConfirm, onCancel }: PixPaymentProps) => {
   const { toast } = useToast();
   const [copied, setCopied] = useState(false);
   const pixPayload = generatePixPayload(price);
