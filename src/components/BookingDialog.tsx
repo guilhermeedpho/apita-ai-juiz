@@ -252,7 +252,7 @@ const BookingDialog = ({ refereeId, refereeName, availableFieldTypes }: BookingD
           )}
 
           {showPixInfo ? (
-            <PixPayment price={price} onConfirm={handleClose} />
+            <PixPayment price={price} onConfirm={handleClose} onCancel={handleCancelPayment} />
           ) : (
             <Button onClick={handleSubmit} disabled={submitting} className="w-full font-semibold">
               {submitting ? "Agendando..." : "Confirmar agendamento"}
