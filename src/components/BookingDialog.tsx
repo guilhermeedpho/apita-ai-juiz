@@ -105,13 +105,19 @@ const BookingDialog = ({ refereeId, refereeName, availableFieldTypes }: BookingD
     } else {
       playNotificationSound();
       toast({ title: "Partida agendada! 🎉", description: `${refereeName} foi escalado para sua partida.` });
-      setOpen(false);
-      setFieldType("");
-      setDuration(60);
-      setLocation("");
-      setScheduledAt("");
-      setNotes("");
+      setShowPixInfo(true);
     }
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+    setShowPixInfo(false);
+    setFieldType("");
+    setDuration(60);
+    setLocation("");
+    setScheduledAt("");
+    setNotes("");
+  };
   };
 
   return (
