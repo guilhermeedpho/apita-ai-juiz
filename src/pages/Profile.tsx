@@ -444,6 +444,7 @@ const Profile = () => {
                     {fieldTypes.includes(opt.value) && (
                       <span className="text-xs font-medium text-primary">
                         60min: R${PRICE_TABLE[opt.value]?.[60]} | 90min: R${PRICE_TABLE[opt.value]?.[90]}
+                        {PRICE_TABLE[opt.value]?.[120] ? ` | 120min: R$${PRICE_TABLE[opt.value][120]}` : ""}
                       </span>
                     )}
                   </button>
