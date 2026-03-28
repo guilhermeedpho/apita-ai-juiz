@@ -118,7 +118,6 @@ const BookingDialog = ({ refereeId, refereeName, availableFieldTypes }: BookingD
     setScheduledAt("");
     setNotes("");
   };
-  };
 
   return (
     <Dialog open={open} onOpenChange={(v) => { if (!v) handleClose(); else setOpen(true); }}>
