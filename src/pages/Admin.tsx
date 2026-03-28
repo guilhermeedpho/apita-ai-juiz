@@ -167,6 +167,12 @@ const Admin = () => {
         {/* All Users */}
         <AdminUsers />
 
+        {/* Support Messages */}
+        <AdminSupportMessages />
+
+        {/* Matches Manager */}
+        <AdminMatchesManager />
+
         {/* Verification Filters */}
         <div className="flex gap-2 justify-center flex-wrap">
           {(["pending", "approved", "rejected", "all"] as const).map((f) => (

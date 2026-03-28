@@ -595,6 +595,17 @@ const Profile = () => {
 
         {/* My Matches with Chat */}
         <MyMatches />
+
+        {/* Settings */}
+        <Card className="bg-gradient-card border-border shadow-card">
+          <CardHeader>
+            <CardTitle className="text-xl">⚙️ CONFIGURAÇÕES</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <ContactAdminDialog />
+            <DeleteAccountDialog />
+          </CardContent>
+        </Card>
       </div>
       <Footer />
     </div>
