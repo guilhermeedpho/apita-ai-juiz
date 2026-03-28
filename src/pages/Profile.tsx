@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import Navbar from "@/components/Navbar";
@@ -47,6 +47,8 @@ const COMPETITION_LEVEL_OPTIONS = [
 const Profile = () => {
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const refereeMode = searchParams.get("modo") === "arbitro";
   const { toast } = useToast();
 
   const [fullName, setFullName] = useState("");
@@ -72,9 +74,9 @@ const Profile = () => {
 
   useEffect(() => {
     if (!authLoading && !user) {
-      navigate("/auth");
+      navigate(refereeMode ? "/auth?modo=cadastro&tipo=arbitro" : "/auth");
     }
-  }, [user, authLoading, navigate]);
+  }, [user, authLoading, navigate, refereeMode]);
 
   useEffect(() => {
     if (!user) return;
@@ -129,6 +131,14 @@ const Profile = () => {
     fetchReferee();
     fetchVerification();
   }, [user]);
+
+  useEffect(() => {
+    if (refereeMode && profileLoaded) {
+      requestAnimationFrame(() => {
+        document.getElementById("referee-registration-card")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    }
+  }, [refereeMode, profileLoaded]);
 
   const handleSaveProfile = async () => {
     if (!user) return;
