@@ -1,11 +1,12 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import QRCode from "react-qr-code";
 import { Button } from "@/components/ui/button";
-import { Check, Copy, QrCode, CreditCard, XCircle } from "lucide-react";
+import { Check, Copy, QrCode, CreditCard, XCircle, Timer } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const PIX_KEY = "58722776000103";
 const PIX_NAME = "APITAJÁ LTDA";
+const EXPIRATION_SECONDS = 10 * 60; // 10 minutes
 
 function generatePixPayload(amount: number): string {
   const formatField = (id: string, value: string) => {
@@ -16,18 +17,17 @@ function generatePixPayload(amount: number): string {
     formatField("00", "br.gov.bcb.pix") + formatField("01", PIX_KEY);
 
   let payload = "";
-  payload += formatField("00", "01"); // Payload format
-  payload += formatField("26", merchantAccount); // Merchant account
-  payload += formatField("52", "0000"); // MCC
-  payload += formatField("53", "986"); // Currency BRL
-  payload += formatField("54", amount.toFixed(2)); // Amount
-  payload += formatField("58", "BR"); // Country
-  payload += formatField("59", "APITAJA LTDA"); // Merchant name
-  payload += formatField("60", "SAO PAULO"); // City
-  payload += formatField("62", formatField("05", "***")); // Additional data
-  payload += "6304"; // CRC placeholder
+  payload += formatField("00", "01");
+  payload += formatField("26", merchantAccount);
+  payload += formatField("52", "0000");
+  payload += formatField("53", "986");
+  payload += formatField("54", amount.toFixed(2));
+  payload += formatField("58", "BR");
+  payload += formatField("59", "APITAJA LTDA");
+  payload += formatField("60", "SAO PAULO");
+  payload += formatField("62", formatField("05", "***"));
+  payload += "6304";
 
-  // CRC16 calculation
   const crc = crc16(payload);
   payload += crc.toUpperCase();
 
@@ -59,7 +59,40 @@ interface PixPaymentProps {
 const PixPayment = ({ price, onConfirm, onCancel }: PixPaymentProps) => {
   const { toast } = useToast();
   const [copied, setCopied] = useState(false);
+  const [secondsLeft, setSecondsLeft] = useState(EXPIRATION_SECONDS);
   const pixPayload = generatePixPayload(price);
+
+  const expired = secondsLeft <= 0;
+
+  const handleExpire = useCallback(() => {
+    toast({
+      title: "Tempo expirado ⏰",
+      description: "O pagamento PIX expirou. A partida foi cancelada automaticamente.",
+      variant: "destructive",
+    });
+    onCancel();
+  }, [onCancel, toast]);
+
+  useEffect(() => {
+    if (expired) {
+      handleExpire();
+      return;
+    }
+    const interval = setInterval(() => {
+      setSecondsLeft((prev) => {
+        if (prev <= 1) {
+          clearInterval(interval);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [expired, handleExpire]);
+
+  const minutes = Math.floor(secondsLeft / 60);
+  const seconds = secondsLeft % 60;
+  const timerColor = secondsLeft <= 60 ? "text-destructive" : secondsLeft <= 180 ? "text-accent" : "text-primary";
 
   const handleCopy = async () => {
     try {
@@ -75,9 +108,15 @@ const PixPayment = ({ price, onConfirm, onCancel }: PixPaymentProps) => {
   return (
     <div className="space-y-4">
       <div className="rounded-lg bg-primary/10 border border-primary/30 p-4 text-center space-y-3">
-        <div className="flex items-center justify-center gap-2">
-          <QrCode className="h-5 w-5 text-primary" />
-          <p className="text-sm font-semibold text-primary">Pague via PIX</p>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <QrCode className="h-5 w-5 text-primary" />
+            <p className="text-sm font-semibold text-primary">Pague via PIX</p>
+          </div>
+          <div className={`flex items-center gap-1.5 ${timerColor} font-mono font-bold text-sm`}>
+            <Timer className="h-4 w-4" />
+            <span>{String(minutes).padStart(2, "0")}:{String(seconds).padStart(2, "0")}</span>
+          </div>
         </div>
 
         <div className="flex justify-center p-3 bg-background rounded-xl">
