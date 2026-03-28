@@ -297,6 +297,70 @@ const Profile = () => {
     rejected: { label: "Rejeitado", icon: XCircle, color: "bg-destructive text-destructive-foreground" },
   };
 
+  if (showRefereeSuccess) {
+    return (
+      <div className="min-h-screen bg-background referee-theme">
+        <Navbar />
+        <div className="pt-24 pb-16 container mx-auto px-4 max-w-lg flex flex-col items-center justify-center text-center space-y-8">
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ type: "spring", stiffness: 200, damping: 15 }}
+            className="h-28 w-28 rounded-full bg-primary/20 flex items-center justify-center shadow-glow-referee"
+          >
+            <CheckCircle className="h-14 w-14 text-primary" />
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="space-y-3"
+          >
+            <h1 className="text-4xl md:text-5xl font-display">
+              CADASTRO <span className="text-gradient-referee">CONCLUÍDO!</span>
+            </h1>
+            <p className="text-muted-foreground text-lg max-w-sm mx-auto">
+              Seu perfil de árbitro está ativo. Agora você aparece na lista e pode receber convites para partidas.
+            </p>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+            className="flex flex-col sm:flex-row gap-3 w-full max-w-xs"
+          >
+            <Button
+              size="lg"
+              className="flex-1 font-semibold text-lg gap-2"
+              onClick={() => navigate("/")}
+            >
+              Ir para minha área
+              <ArrowRight className="h-5 w-5" />
+            </Button>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.7 }}
+            className="grid grid-cols-3 gap-6 pt-4 border-t border-border w-full max-w-sm"
+          >
+            {fieldTypes.map((ft) => (
+              <div key={ft} className="text-center">
+                <p className="text-xl font-display text-gradient-referee">
+                  R${FIXED_PRICES[ft]}
+                </p>
+                <p className="text-xs text-muted-foreground capitalize">{ft}</p>
+              </div>
+            ))}
+          </motion.div>
+        </div>
+      </div>
+    );
+  }
+
   if (authLoading || !profileLoaded) {
     return (
       <div className={`min-h-screen bg-background ${refereeMode ? "referee-theme" : ""}`}>
