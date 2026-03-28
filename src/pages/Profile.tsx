@@ -22,10 +22,10 @@ const FIXED_PRICES: Record<string, number> = {
 };
 
 const PRICE_TABLE: Record<string, Record<number, number>> = {
-  society: { 60: 130, 90: 180 },
+  society: { 60: 130, 90: 180, 120: 220 },
   campo: { 60: 200, 90: 280 },
-  futsal: { 60: 100, 90: 140 },
-  areia: { 60: 100, 90: 140 },
+  futsal: { 60: 100, 90: 140, 120: 170 },
+  areia: { 60: 100, 90: 140, 120: 170 },
 };
 
 const FIELD_TYPE_OPTIONS = [
