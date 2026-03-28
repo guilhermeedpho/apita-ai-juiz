@@ -37,6 +37,18 @@ const RefereeList = () => {
   const [referees, setReferees] = useState<RefereeData[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const getAvatarUrl = (avatarUrl: string | null | undefined, fullName?: string) => {
+    if (avatarUrl) {
+      if (avatarUrl.startsWith("http://") || avatarUrl.startsWith("https://")) {
+        return avatarUrl;
+      }
+
+      return supabase.storage.from("avatars").getPublicUrl(avatarUrl).data.publicUrl;
+    }
+
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(fullName || "A")}&background=1a1a2e&color=2ecc71&bold=true`;
+  };
+
   useEffect(() => {
     const fetchReferees = async () => {
       const { data: refereesData } = await supabase
@@ -123,10 +135,7 @@ const RefereeList = () => {
                 rawFieldTypes={ref.field_types}
                 competitionLevels={ref.competition_levels}
                 isVerified={ref.is_verified}
-                avatar={
-                  ref.profile?.avatar_url ||
-                  `https://ui-avatars.com/api/?name=${encodeURIComponent(ref.profile?.full_name || "A")}&background=1a1a2e&color=2ecc71&bold=true`
-                }
+                avatar={getAvatarUrl(ref.profile?.avatar_url, ref.profile?.full_name)}
               />
             ))}
           </div>
