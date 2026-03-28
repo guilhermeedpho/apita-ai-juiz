@@ -85,7 +85,7 @@ const BookingDialog = ({ refereeId, refereeName, availableFieldTypes }: BookingD
 
     setSubmitting(true);
 
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from("matches" as any)
       .insert({
         referee_id: refereeId,
@@ -98,13 +98,16 @@ const BookingDialog = ({ refereeId, refereeName, availableFieldTypes }: BookingD
         platform_fee: platformFee,
         referee_payout: refereePayout,
         notes: notes.trim() || null,
-      });
+      })
+      .select("id")
+      .single();
 
     setSubmitting(false);
 
     if (error) {
       toast({ title: "Erro ao agendar", description: error.message, variant: "destructive" });
     } else {
+      setCreatedMatchId((data as any)?.id || null);
       playNotificationSound();
       toast({ title: "Partida agendada! 🎉", description: `${refereeName} foi escalado para sua partida.` });
       setShowPixInfo(true);
