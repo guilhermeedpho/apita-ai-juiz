@@ -29,6 +29,7 @@ const App = () => (
             <Route path="/perfil" element={<Profile />} />
             <Route path="/admin" element={<Admin />} />
             <Route path="/instalar" element={<Install />} />
+            <Route path="/pagamento-confirmado" element={<PaymentConfirmed />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
