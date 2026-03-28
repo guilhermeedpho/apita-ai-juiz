@@ -84,9 +84,9 @@ const PaymentConfirmed = () => {
               </div>
 
               <div>
-                <p className="text-lg font-semibold text-foreground">Pagamento confirmado! 🎉</p>
+                <p className="text-lg font-semibold text-foreground">Pagamento enviado! ⏳</p>
                 <p className="text-sm text-muted-foreground mt-1">
-                  Sua partida está confirmada.
+                  Seu pagamento está sendo verificado. A partida será confirmada assim que o admin aprovar o PIX.
                 </p>
               </div>
 
