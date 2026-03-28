@@ -442,8 +442,8 @@ const Profile = () => {
                     </span>
                     <span className="text-sm flex-1">{opt.label}</span>
                     {fieldTypes.includes(opt.value) && (
-                      <span className="text-sm font-medium text-primary">
-                        R$ {FIXED_PRICES[opt.value]}
+                      <span className="text-xs font-medium text-primary">
+                        60min: R${PRICE_TABLE[opt.value]?.[60]} | 90min: R${PRICE_TABLE[opt.value]?.[90]}
                       </span>
                     )}
                   </button>
