@@ -71,6 +71,7 @@ const Profile = () => {
   const [refereeError, setRefereeError] = useState<string | null>(null);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const [showRefereeSuccess, setShowRefereeSuccess] = useState(false);
 
   useEffect(() => {
     if (!authLoading && !user) {
