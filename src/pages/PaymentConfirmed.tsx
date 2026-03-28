@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { CheckCircle2, PartyPopper, CalendarDays, Loader2 } from "lucide-react";
+import { CheckCircle2, PartyPopper, CalendarDays, Loader2, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -23,37 +23,48 @@ const PaymentConfirmed = () => {
   const [error, setError] = useState("");
 
   const matchId = searchParams.get("match_id");
-  const nsu = searchParams.get("nsu");
+
+  const fetchMatch = useCallback(async () => {
+    if (!matchId || !user) return;
+    const { data } = await supabase
+      .from("matches" as any)
+      .select("*")
+      .eq("id", matchId)
+      .single();
+    if (data) setMatch(data);
+    return data;
+  }, [matchId, user]);
 
   useEffect(() => {
-    const confirmAndFetch = async () => {
+    const init = async () => {
       if (!matchId || !user) {
         setError("Dados de pagamento inválidos");
         setLoading(false);
         return;
       }
-
       try {
-        // Only fetch match details - do NOT auto-confirm
-        // Payment confirmation is done manually by admin after verifying PIX
-        const { data, error: fetchError } = await supabase
-          .from("matches" as any)
-          .select("*")
-          .eq("id", matchId)
-          .single();
-
-        if (fetchError) throw fetchError;
-        setMatch(data);
+        await fetchMatch();
       } catch (err) {
-        console.error("Error confirming payment:", err);
-        setError("Erro ao confirmar pagamento");
+        console.error("Error fetching match:", err);
+        setError("Erro ao buscar dados da partida");
       } finally {
         setLoading(false);
       }
     };
+    if (user) init();
+  }, [matchId, user, fetchMatch]);
 
-    if (user) confirmAndFetch();
-  }, [matchId, user]);
+  // Poll for status changes (webhook may confirm it)
+  useEffect(() => {
+    if (!match || (match as any).status === "confirmed") return;
+    const interval = setInterval(async () => {
+      const updated = await fetchMatch();
+      if ((updated as any)?.status === "confirmed") clearInterval(interval);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [match, fetchMatch]);
+
+  const isConfirmed = (match as any)?.status === "confirmed";
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -63,7 +74,7 @@ const PaymentConfirmed = () => {
           {loading ? (
             <div className="text-center space-y-4">
               <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto" />
-              <p className="text-muted-foreground">Confirmando pagamento...</p>
+              <p className="text-muted-foreground">Carregando...</p>
             </div>
           ) : error ? (
             <div className="text-center space-y-4">
@@ -76,18 +87,35 @@ const PaymentConfirmed = () => {
             <div className="space-y-5 text-center">
               <div className="flex justify-center">
                 <div className="relative">
-                  <div className="h-20 w-20 rounded-full bg-primary/15 flex items-center justify-center mx-auto">
-                    <CheckCircle2 className="h-10 w-10 text-primary" />
+                  <div className={`h-20 w-20 rounded-full flex items-center justify-center mx-auto ${isConfirmed ? "bg-green-500/15" : "bg-yellow-500/15"}`}>
+                    {isConfirmed ? (
+                      <CheckCircle2 className="h-10 w-10 text-green-500" />
+                    ) : (
+                      <Clock className="h-10 w-10 text-yellow-500 animate-pulse" />
+                    )}
                   </div>
-                  <PartyPopper className="h-6 w-6 text-accent absolute -top-1 -right-1 animate-bounce" />
+                  {isConfirmed && (
+                    <PartyPopper className="h-6 w-6 text-accent absolute -top-1 -right-1 animate-bounce" />
+                  )}
                 </div>
               </div>
 
               <div>
-                <p className="text-lg font-semibold text-foreground">Pagamento enviado! ⏳</p>
-                <p className="text-sm text-muted-foreground mt-1">
-                  Seu pagamento está sendo verificado. A partida será confirmada assim que o admin aprovar o PIX.
-                </p>
+                {isConfirmed ? (
+                  <>
+                    <p className="text-lg font-semibold text-foreground">Pagamento confirmado! ✅</p>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Sua partida foi agendada com sucesso. O árbitro já foi notificado!
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-lg font-semibold text-foreground">Aguardando confirmação ⏳</p>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Seu pagamento está sendo processado. Esta página será atualizada automaticamente quando confirmado.
+                    </p>
+                  </>
+                )}
               </div>
 
               <div className="rounded-lg bg-secondary/50 p-4 text-sm space-y-2 text-left">
@@ -107,8 +135,14 @@ const PaymentConfirmed = () => {
                   <span className="text-muted-foreground">Data</span>
                   <span>{new Date((match as any).scheduled_at).toLocaleString("pt-BR")}</span>
                 </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Status</span>
+                  <span className={`font-medium ${isConfirmed ? "text-green-500" : "text-yellow-500"}`}>
+                    {isConfirmed ? "Confirmado" : "Pendente"}
+                  </span>
+                </div>
                 <div className="flex justify-between font-semibold border-t border-border pt-2 mt-1">
-                  <span>Valor pago</span>
+                  <span>Valor</span>
                   <span className="text-primary">R$ {(match as any).price}</span>
                 </div>
               </div>
