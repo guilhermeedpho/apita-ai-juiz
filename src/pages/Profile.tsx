@@ -297,7 +297,7 @@ const Profile = () => {
 
   if (authLoading || !profileLoaded) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className={`min-h-screen bg-background ${refereeMode ? "referee-theme" : ""}`}>
         <Navbar />
         <div className="pt-24 flex justify-center">
           <p className="text-muted-foreground">Carregando...</p>
@@ -307,10 +307,17 @@ const Profile = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className={`min-h-screen bg-background ${refereeMode ? "referee-theme" : ""}`}>
       <Navbar />
       <div className="pt-24 pb-16 container mx-auto px-4 max-w-2xl space-y-6">
-        <h1 className="text-4xl text-center">MEU PERFIL</h1>
+        <div className="space-y-2 text-center">
+          <h1 className="text-4xl">{refereeMode ? "CADASTRO DE ÁRBITRO" : "MEU PERFIL"}</h1>
+          {refereeMode && (
+            <p className="text-sm text-muted-foreground">
+              Complete esta etapa para ativar sua área de árbitro com visual próprio.
+            </p>
+          )}
+        </div>
 
         {/* Avatar / Photo */}
         <Card className="bg-gradient-card border-border shadow-card">
@@ -412,7 +419,10 @@ const Profile = () => {
         </Card>
 
         {/* Referee Registration */}
-        <Card className="bg-gradient-card border-border shadow-card">
+        <Card
+          id="referee-registration-card"
+          className={`bg-gradient-card ${refereeMode ? "border-primary/40 shadow-glow-referee" : "border-border shadow-card"}`}
+        >
           <CardHeader>
             <CardTitle className="text-xl flex items-center gap-2">
               <Shield className="h-5 w-5 text-primary" />
@@ -422,7 +432,9 @@ const Profile = () => {
           <CardContent className="space-y-4">
             {!isReferee && (
               <p className="text-sm text-muted-foreground">
-                Cadastre-se como árbitro para aparecer na lista e receber convites para partidas.
+                {refereeMode
+                  ? "Preencha esta etapa para liberar seu perfil de árbitro e começar a receber convites."
+                  : "Cadastre-se como árbitro para aparecer na lista e receber convites para partidas."}
               </p>
             )}
 

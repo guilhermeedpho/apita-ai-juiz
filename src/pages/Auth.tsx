@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -7,7 +7,6 @@ import { Label } from "@/components/ui/label";
 import { Shield, ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
-import { useEffect } from "react";
 import { z } from "zod";
 
 const signUpSchema = z.object({
@@ -23,6 +22,7 @@ const signInSchema = z.object({
 
 const Auth = () => {
   const [searchParams] = useSearchParams();
+  const refereeMode = searchParams.get("tipo") === "arbitro";
   const [isLogin, setIsLogin] = useState(searchParams.get("modo") !== "cadastro");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -33,8 +33,14 @@ const Auth = () => {
   const { user } = useAuth();
 
   useEffect(() => {
-    if (user) navigate("/");
-  }, [user, navigate]);
+    setIsLogin(searchParams.get("modo") !== "cadastro");
+  }, [searchParams]);
+
+  useEffect(() => {
+    if (user) {
+      navigate(refereeMode ? "/perfil?modo=arbitro" : "/");
+    }
+  }, [user, navigate, refereeMode]);
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,30 +49,28 @@ const Auth = () => {
       toast({ title: "Erro", description: parsed.error.errors[0].message, variant: "destructive" });
       return;
     }
+
     setLoading(true);
     const { error } = await supabase.auth.signUp({
       email: parsed.data.email,
       password: parsed.data.password,
       options: {
         data: { full_name: parsed.data.fullName },
-        emailRedirectTo: window.location.origin,
+        emailRedirectTo: refereeMode ? `${window.location.origin}/perfil?modo=arbitro` : window.location.origin,
       },
     });
     setLoading(false);
+
     if (error) {
       toast({ title: "Erro ao cadastrar", description: error.message, variant: "destructive" });
-    } else {
-      // If signing up as referee, assign role after signup
-      if (searchParams.get("modo") === "cadastro") {
-        const { data: { user: newUser } } = await supabase.auth.getUser();
-        if (newUser) {
-          await supabase.from("user_roles").insert({ user_id: newUser.id, role: "referee" as const });
-          await supabase.from("referees").upsert({ user_id: newUser.id }, { onConflict: "user_id" });
-        }
-      }
-      toast({ title: "Cadastro realizado!" });
-      navigate("/");
+      return;
     }
+
+    toast({
+      title: refereeMode ? "Cadastro de árbitro iniciado!" : "Cadastro realizado!",
+      description: "Confira seu email para confirmar a conta.",
+    });
+    setIsLogin(true);
   };
 
   const handleSignIn = async (e: React.FormEvent) => {
@@ -76,36 +80,51 @@ const Auth = () => {
       toast({ title: "Erro", description: parsed.error.errors[0].message, variant: "destructive" });
       return;
     }
+
     setLoading(true);
     const { error } = await supabase.auth.signInWithPassword({
       email: parsed.data.email,
       password: parsed.data.password,
     });
     setLoading(false);
+
     if (error) {
       toast({ title: "Erro ao entrar", description: error.message, variant: "destructive" });
     } else {
-      navigate("/");
+      navigate(refereeMode ? "/perfil?modo=arbitro" : "/");
     }
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col items-center justify-center px-4">
+    <div className={`min-h-screen bg-background flex flex-col items-center justify-center px-4 ${refereeMode ? "referee-theme" : ""}`}>
       <button onClick={() => navigate("/")} className="absolute top-6 left-6 flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
         <ArrowLeft className="h-4 w-4" />
         <span className="text-sm">Voltar</span>
       </button>
 
       <div className="w-full max-w-sm">
-        <div className="flex items-center justify-center gap-2 mb-8">
-          <Shield className="h-8 w-8 text-primary" />
-          <span className="font-display text-3xl">APITAJÁ</span>
+        <div className="flex flex-col items-center justify-center gap-2 mb-8">
+          {refereeMode && (
+            <span className="rounded-full border border-border bg-card px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-primary shadow-glow-referee">
+              Área do Árbitro
+            </span>
+          )}
+          <div className="flex items-center justify-center gap-2">
+            <Shield className="h-8 w-8 text-primary" />
+            <span className="font-display text-3xl">APITAJÁ</span>
+          </div>
         </div>
 
-        <div className="bg-card border border-border rounded-2xl p-6">
-          <h2 className="font-display text-2xl text-center mb-6">
-            {isLogin ? "ENTRAR" : "CADASTRAR"}
+        <div className={`bg-card border rounded-2xl p-6 ${refereeMode ? "border-primary/40 shadow-glow-referee" : "border-border"}`}>
+          <h2 className="font-display text-2xl text-center mb-2">
+            {isLogin ? (refereeMode ? "ENTRAR COMO ÁRBITRO" : "ENTRAR") : (refereeMode ? "CADASTRO DE ÁRBITRO" : "CADASTRAR")}
           </h2>
+
+          {refereeMode && !isLogin && (
+            <p className="text-center text-sm text-muted-foreground mb-6">
+              Crie sua conta para seguir direto para a área azul de cadastro do árbitro.
+            </p>
+          )}
 
           <form onSubmit={isLogin ? handleSignIn : handleSignUp} className="space-y-4">
             {!isLogin && (
