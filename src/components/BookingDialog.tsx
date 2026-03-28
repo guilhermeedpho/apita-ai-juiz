@@ -160,105 +160,107 @@ const BookingDialog = ({ refereeId, refereeName, availableFieldTypes }: BookingD
         <DialogHeader>
           <DialogTitle>Agendar {refereeName}</DialogTitle>
         </DialogHeader>
-        <div className="space-y-4 pt-2">
-          <div className="space-y-2">
-            <Label>Tipo de campo *</Label>
-            <Select value={fieldType} onValueChange={(v) => { setFieldType(v); }}>
-              <SelectTrigger>
-                <SelectValue placeholder="Selecione o tipo" />
-              </SelectTrigger>
-              <SelectContent>
-                {availableFieldTypes.map((ft) => (
-                  <SelectItem key={ft} value={ft}>
-                    {FIELD_LABELS[ft] || ft}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            <Label className="flex items-center gap-1">
-              <Clock className="h-3.5 w-3.5" /> Tempo de jogo *
-            </Label>
-            <div className="grid grid-cols-2 gap-2">
-              {DURATION_OPTIONS.map((opt) => (
-                <button
-                  key={opt.value}
-                  type="button"
-                  onClick={() => setDuration(opt.value)}
-                  className={`rounded-lg border p-3 text-sm font-medium transition-colors ${
-                    duration === opt.value
-                      ? "border-primary bg-primary/10 text-primary"
-                      : "border-border hover:border-primary/50"
-                  }`}
-                >
-                  {opt.label}
-                  {fieldType && (
-                    <span className="block text-xs mt-1">
-                      R$ {PRICE_TABLE[fieldType]?.[opt.value] || "—"}
-                    </span>
-                  )}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label className="flex items-center gap-1">
-              <MapPin className="h-3.5 w-3.5" /> Local do campo *
-            </Label>
-            <Input
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
-              placeholder="Ex: Arena Society - Zona Sul, SP"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label>Data e horário *</Label>
-            <Input
-              type="datetime-local"
-              value={scheduledAt}
-              onChange={(e) => setScheduledAt(e.target.value)}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label>Observações</Label>
-            <Textarea
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              placeholder="Ex: Partida de campeonato..."
-              rows={2}
-            />
-          </div>
-
-          {fieldType && (
-            <div className="rounded-lg bg-secondary/50 p-3 text-sm space-y-1">
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Modalidade</span>
-                <span>{FIELD_LABELS[fieldType]}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Duração</span>
-                <span>{duration} min</span>
-              </div>
-              <div className="flex justify-between font-semibold">
-                <span>Valor total</span>
-                <span>R$ {price}</span>
-              </div>
-            </div>
-          )}
-
-          {showPixInfo ? (
+        {showPixInfo ? (
+          <div className="pt-2">
             <PixPayment price={price} onConfirm={handleClose} onCancel={handleCancelPayment} />
-          ) : (
+          </div>
+        ) : (
+          <div className="space-y-4 pt-2">
+            <div className="space-y-2">
+              <Label>Tipo de campo *</Label>
+              <Select value={fieldType} onValueChange={(v) => { setFieldType(v); }}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecione o tipo" />
+                </SelectTrigger>
+                <SelectContent>
+                  {availableFieldTypes.map((ft) => (
+                    <SelectItem key={ft} value={ft}>
+                      {FIELD_LABELS[ft] || ft}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label className="flex items-center gap-1">
+                <Clock className="h-3.5 w-3.5" /> Tempo de jogo *
+              </Label>
+              <div className="grid grid-cols-2 gap-2">
+                {DURATION_OPTIONS.map((opt) => (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    onClick={() => setDuration(opt.value)}
+                    className={`rounded-lg border p-3 text-sm font-medium transition-colors ${
+                      duration === opt.value
+                        ? "border-primary bg-primary/10 text-primary"
+                        : "border-border hover:border-primary/50"
+                    }`}
+                  >
+                    {opt.label}
+                    {fieldType && (
+                      <span className="block text-xs mt-1">
+                        R$ {PRICE_TABLE[fieldType]?.[opt.value] || "—"}
+                      </span>
+                    )}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label className="flex items-center gap-1">
+                <MapPin className="h-3.5 w-3.5" /> Local do campo *
+              </Label>
+              <Input
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+                placeholder="Ex: Arena Society - Zona Sul, SP"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Data e horário *</Label>
+              <Input
+                type="datetime-local"
+                value={scheduledAt}
+                onChange={(e) => setScheduledAt(e.target.value)}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Observações</Label>
+              <Textarea
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                placeholder="Ex: Partida de campeonato..."
+                rows={2}
+              />
+            </div>
+
+            {fieldType && (
+              <div className="rounded-lg bg-secondary/50 p-3 text-sm space-y-1">
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Modalidade</span>
+                  <span>{FIELD_LABELS[fieldType]}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Duração</span>
+                  <span>{duration} min</span>
+                </div>
+                <div className="flex justify-between font-semibold">
+                  <span>Valor total</span>
+                  <span>R$ {price}</span>
+                </div>
+              </div>
+            )}
+
             <Button onClick={handleSubmit} disabled={submitting} className="w-full font-semibold">
               {submitting ? "Agendando..." : "Confirmar agendamento"}
             </Button>
-          )}
-        </div>
+          </div>
+        )}
       </DialogContent>
     </Dialog>
   );
