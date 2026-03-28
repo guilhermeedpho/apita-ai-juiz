@@ -11,13 +11,21 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { Upload, CheckCircle, Clock, XCircle, User, Phone, MapPin, FileText, Shield, DollarSign } from "lucide-react";
+import { Upload, CheckCircle, Clock, XCircle, User, Phone, MapPin, FileText, Shield, DollarSign, Camera } from "lucide-react";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 const FIXED_PRICES: Record<string, number> = {
   society: 130,
   campo: 200,
   futsal: 100,
   areia: 100,
+};
+
+const PRICE_TABLE: Record<string, Record<number, number>> = {
+  society: { 60: 130, 90: 180 },
+  campo: { 60: 200, 90: 280 },
+  futsal: { 60: 100, 90: 140 },
+  areia: { 60: 100, 90: 140 },
 };
 
 const FIELD_TYPE_OPTIONS = [
@@ -56,6 +64,8 @@ const Profile = () => {
   const [competitionLevels, setCompetitionLevels] = useState<string[]>([]);
   const [savingReferee, setSavingReferee] = useState(false);
   const [refereeError, setRefereeError] = useState<string | null>(null);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -78,6 +88,7 @@ const Profile = () => {
         setPhone(data.phone || "");
         setRegion(data.region || "");
         setBio(data.bio || "");
+        setAvatarUrl(data.avatar_url || null);
       }
       setProfileLoaded(true);
     };
@@ -288,6 +299,58 @@ const Profile = () => {
       <div className="pt-24 pb-16 container mx-auto px-4 max-w-2xl space-y-6">
         <h1 className="text-4xl text-center">MEU PERFIL</h1>
 
+        {/* Avatar / Photo */}
+        <Card className="bg-gradient-card border-border shadow-card">
+          <CardContent className="pt-6 flex flex-col items-center gap-4">
+            <div className="relative">
+              <Avatar className="h-24 w-24">
+                {avatarUrl ? (
+                  <AvatarImage src={supabase.storage.from("avatars").getPublicUrl(avatarUrl).data.publicUrl} alt="Foto" />
+                ) : null}
+                <AvatarFallback className="text-2xl bg-muted">
+                  {fullName ? fullName.slice(0, 2).toUpperCase() : <Camera className="h-8 w-8" />}
+                </AvatarFallback>
+              </Avatar>
+              <label className="absolute -bottom-1 -right-1 bg-primary text-primary-foreground rounded-full p-1.5 cursor-pointer hover:opacity-80 transition-opacity">
+                <Camera className="h-4 w-4" />
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  className="hidden"
+                  disabled={uploadingAvatar}
+                  onChange={async (e) => {
+                    if (!user || !e.target.files?.[0]) return;
+                    const file = e.target.files[0];
+                    if (file.size > 3 * 1024 * 1024) {
+                      toast({ title: "Máximo 3MB", variant: "destructive" });
+                      return;
+                    }
+                    setUploadingAvatar(true);
+                    const ext = file.name.split(".").pop();
+                    const path = `${user.id}/avatar.${ext}`;
+                    const { error: upErr } = await supabase.storage.from("avatars").upload(path, file, { upsert: true });
+                    if (upErr) {
+                      toast({ title: "Erro no upload", description: upErr.message, variant: "destructive" });
+                      setUploadingAvatar(false);
+                      return;
+                    }
+                    await supabase.from("profiles").update({ avatar_url: path }).eq("user_id", user.id);
+                    setAvatarUrl(path);
+                    setUploadingAvatar(false);
+                    toast({ title: "Foto atualizada!" });
+                  }}
+                />
+              </label>
+            </div>
+            {!avatarUrl && (
+              <p className="text-sm text-destructive text-center font-medium">
+                ⚠️ Adicione uma foto com rosto limpo para completar seu perfil
+              </p>
+            )}
+            {uploadingAvatar && <p className="text-xs text-muted-foreground">Enviando...</p>}
+          </CardContent>
+        </Card>
+
         {/* Profile Info */}
         <Card className="bg-gradient-card border-border shadow-card">
           <CardHeader>
@@ -379,8 +442,8 @@ const Profile = () => {
                     </span>
                     <span className="text-sm flex-1">{opt.label}</span>
                     {fieldTypes.includes(opt.value) && (
-                      <span className="text-sm font-medium text-primary">
-                        R$ {FIXED_PRICES[opt.value]}
+                      <span className="text-xs font-medium text-primary">
+                        60min: R${PRICE_TABLE[opt.value]?.[60]} | 90min: R${PRICE_TABLE[opt.value]?.[90]}
                       </span>
                     )}
                   </button>

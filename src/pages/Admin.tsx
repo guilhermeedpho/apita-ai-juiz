@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { ShieldCheck, FileText, CheckCircle, XCircle, Eye, Clock } from "lucide-react";
 import AdminFinancials from "@/components/AdminFinancials";
+import AdminUsers from "@/components/AdminUsers";
 
 interface Verification {
   id: string;
@@ -160,6 +161,9 @@ const Admin = () => {
         </h1>
         {/* Financial Dashboard */}
         <AdminFinancials />
+
+        {/* All Users */}
+        <AdminUsers />
 
         {/* Verification Filters */}
         <div className="flex gap-2 justify-center flex-wrap">
