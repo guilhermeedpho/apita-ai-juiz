@@ -16,10 +16,15 @@ serve(async (req) => {
     const payload = await req.json();
     console.log("InfinitePay webhook received:", JSON.stringify(payload));
 
-    const orderNsu = payload.order_nsu || payload.orderNsu;
-    const status = payload.status;
+    // InfinitePay can send different payload formats
+    const orderNsu = payload.order_nsu || payload.orderNsu || payload.nsu;
+    const status = payload.status || payload.payment_status;
+    const paymentId = payload.id || payload.payment_id;
+
+    console.log("Parsed - NSU:", orderNsu, "Status:", status, "PaymentID:", paymentId);
 
     if (!orderNsu) {
+      console.error("No order_nsu found in payload");
       return new Response(JSON.stringify({ error: "order_nsu missing" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -38,20 +43,25 @@ serve(async (req) => {
       .single();
 
     if (fetchError || !match) {
-      console.error("Match not found for NSU:", orderNsu);
+      console.error("Match not found for NSU:", orderNsu, "Error:", fetchError);
       return new Response(JSON.stringify({ error: "Match not found" }), {
         status: 404,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    // Update match as confirmed
-    if (status === "approved" || status === "paid" || status === "completed") {
+    console.log("Found match:", match.id, "Current status:", match.status);
+
+    // Accept various success statuses from InfinitePay
+    const successStatuses = ["approved", "paid", "completed", "captured", "authorized", "finished"];
+    const isSuccess = successStatuses.includes((status || "").toLowerCase());
+
+    if (isSuccess && match.status !== "confirmed") {
       const { error: updateError } = await supabase
         .from("matches")
         .update({
           status: "confirmed",
-          payment_method: payload.capture_method || "pix",
+          payment_method: payload.capture_method || payload.payment_method || "pix",
           paid_at: new Date().toISOString(),
         })
         .eq("id", match.id);
@@ -65,6 +75,8 @@ serve(async (req) => {
       }
 
       console.log("Match confirmed via webhook:", match.id);
+    } else {
+      console.log("No update needed. Status:", status, "isSuccess:", isSuccess, "matchStatus:", match.status);
     }
 
     return new Response(JSON.stringify({ success: true }), {
