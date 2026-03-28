@@ -81,6 +81,7 @@ const Profile = () => {
         setPhone(data.phone || "");
         setRegion(data.region || "");
         setBio(data.bio || "");
+        setAvatarUrl(data.avatar_url || null);
       }
       setProfileLoaded(true);
     };
