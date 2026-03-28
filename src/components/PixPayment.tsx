@@ -3,6 +3,7 @@ import QRCode from "react-qr-code";
 import { Button } from "@/components/ui/button";
 import { Check, Copy, QrCode, CreditCard, XCircle, Timer } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const PIX_KEY = "58722776000103";
 const PIX_NAME = "APITAJÁ LTDA";
@@ -50,13 +51,16 @@ function crc16(str: string): string {
 
 interface PixPaymentProps {
   price: number;
-  onConfirm: () => void;
-  onCancel: () => void;
+  onConfirm: () => void | Promise<void>;
+  onCancel: () => void | Promise<void>;
 }
 
 const PixPayment = ({ price, onConfirm, onCancel }: PixPaymentProps) => {
   const { toast } = useToast();
+  const isMobile = useIsMobile();
   const [copied, setCopied] = useState(false);
+  const [keyCopied, setKeyCopied] = useState(false);
+  const [confirming, setConfirming] = useState(false);
   const [secondsLeft, setSecondsLeft] = useState(EXPIRATION_SECONDS);
   const onCancelRef = useRef(onCancel);
   onCancelRef.current = onCancel;
@@ -90,9 +94,43 @@ const PixPayment = ({ price, onConfirm, onCancel }: PixPaymentProps) => {
       ? "text-accent"
       : "text-primary";
 
+  const copyText = async (text: string, manualLabel: string) => {
+    if (navigator.clipboard?.writeText && window.isSecureContext) {
+      try {
+        await navigator.clipboard.writeText(text);
+        return true;
+      } catch {
+        // fallback below
+      }
+    }
+
+    const textarea = document.createElement("textarea");
+    textarea.value = text;
+    textarea.setAttribute("readonly", "");
+    textarea.style.position = "fixed";
+    textarea.style.opacity = "0";
+    textarea.style.pointerEvents = "none";
+    document.body.appendChild(textarea);
+    textarea.focus();
+    textarea.select();
+    textarea.setSelectionRange(0, text.length);
+
+    try {
+      const successful = document.execCommand("copy");
+      if (successful) return true;
+    } catch {
+      // manual fallback below
+    } finally {
+      document.body.removeChild(textarea);
+    }
+
+    window.prompt(`Copie manualmente ${manualLabel}:`, text);
+    return false;
+  };
+
   const handleCopyPayload = async () => {
     try {
-      await navigator.clipboard.writeText(pixPayload);
+      await copyText(pixPayload, "o código PIX");
       setCopied(true);
       toast({ title: "Código PIX copiado! ✅" });
       setTimeout(() => setCopied(false), 3000);
@@ -103,10 +141,27 @@ const PixPayment = ({ price, onConfirm, onCancel }: PixPaymentProps) => {
 
   const handleCopyKey = async () => {
     try {
-      await navigator.clipboard.writeText(PIX_KEY);
+      await copyText(PIX_KEY, "a chave PIX");
+      setKeyCopied(true);
       toast({ title: "Chave PIX copiada! ✅" });
+      setTimeout(() => setKeyCopied(false), 3000);
     } catch {
       toast({ title: "Erro ao copiar", variant: "destructive" });
+    }
+  };
+
+  const handleConfirmPayment = async () => {
+    try {
+      setConfirming(true);
+      await onConfirm();
+    } catch {
+      toast({
+        title: "Não foi possível confirmar o pagamento",
+        description: "Tente novamente em instantes.",
+        variant: "destructive",
+      });
+    } finally {
+      setConfirming(false);
     }
   };
 
@@ -127,7 +182,7 @@ const PixPayment = ({ price, onConfirm, onCancel }: PixPaymentProps) => {
         </div>
 
         <div className="flex justify-center p-3 bg-background rounded-xl">
-          <QRCode value={pixPayload} size={180} />
+          <QRCode value={pixPayload} size={isMobile ? 156 : 180} />
         </div>
 
         <p className="text-xs text-muted-foreground">
@@ -142,6 +197,7 @@ const PixPayment = ({ price, onConfirm, onCancel }: PixPaymentProps) => {
           <div className="flex justify-between items-center gap-2">
             <span className="text-muted-foreground">Chave (CNPJ):</span>
             <button
+              type="button"
               onClick={handleCopyKey}
               className="flex items-center gap-1 font-mono text-xs font-bold hover:text-primary transition-colors"
               title="Copiar chave"
@@ -156,21 +212,58 @@ const PixPayment = ({ price, onConfirm, onCancel }: PixPaymentProps) => {
           </div>
         </div>
 
-        <Button variant="outline" onClick={handleCopyPayload} className="w-full gap-2">
-          {copied ? (
-            <>
-              <Check className="h-4 w-4" /> Copiado!
-            </>
-          ) : (
-            <>
-              <Copy className="h-4 w-4" /> Copiar código Pix Copia e Cola
-            </>
-          )}
-        </Button>
+        <div className="space-y-3 text-left">
+          <div className="space-y-2">
+            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              Chave PIX para copiar e colar
+            </p>
+            <div className="flex gap-2">
+              <input
+                readOnly
+                value={PIX_KEY}
+                onFocus={(event) => event.currentTarget.select()}
+                onClick={(event) => event.currentTarget.select()}
+                className="h-10 w-full rounded-md border border-input bg-background px-3 py-2 font-mono text-xs text-foreground select-all"
+              />
+              <Button type="button" variant="outline" onClick={handleCopyKey} className="shrink-0 gap-2">
+                {keyCopied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                {keyCopied ? "Copiada" : "Copiar"}
+              </Button>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              Pix Copia e Cola
+            </p>
+            <textarea
+              readOnly
+              value={pixPayload}
+              onFocus={(event) => event.currentTarget.select()}
+              onClick={(event) => event.currentTarget.select()}
+              className="min-h-24 w-full resize-none rounded-md border border-input bg-background px-3 py-2 font-mono text-xs leading-relaxed text-foreground select-all"
+            />
+            <Button type="button" variant="outline" onClick={handleCopyPayload} className="w-full gap-2">
+              {copied ? (
+                <>
+                  <Check className="h-4 w-4" /> Copiado!
+                </>
+              ) : (
+                <>
+                  <Copy className="h-4 w-4" /> Copiar código Pix Copia e Cola
+                </>
+              )}
+            </Button>
+            <p className="text-[11px] text-muted-foreground">
+              Se o navegador bloquear a cópia, toque no campo e copie manualmente.
+            </p>
+          </div>
+        </div>
       </div>
 
       <div className="grid grid-cols-2 gap-2">
         <Button
+          type="button"
           variant="outline"
           onClick={onCancel}
           className="font-semibold gap-2 text-destructive border-destructive/30 hover:bg-destructive/10"
@@ -178,9 +271,9 @@ const PixPayment = ({ price, onConfirm, onCancel }: PixPaymentProps) => {
           <XCircle className="h-4 w-4" />
           Cancelar
         </Button>
-        <Button onClick={onConfirm} className="font-semibold gap-2">
+        <Button type="button" onClick={handleConfirmPayment} disabled={confirming} className="font-semibold gap-2">
           <CreditCard className="h-4 w-4" />
-          Já paguei
+          {confirming ? "Confirmando..." : "Já paguei"}
         </Button>
       </div>
     </div>
