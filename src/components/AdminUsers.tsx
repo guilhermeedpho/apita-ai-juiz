@@ -194,9 +194,12 @@ const AdminUsers = () => {
                           {r.region || r.profile?.region || "Sem região"} • R$ {r.price_per_match}
                         </p>
                         {r.pix_key && (
-                          <p className="text-xs text-primary font-medium truncate">
-                            PIX: {r.pix_key}
-                          </p>
+                          <div className="flex items-center gap-1">
+                            <p className="text-xs text-primary font-medium truncate">
+                              PIX: {r.pix_key}
+                            </p>
+                            <CopyPixButton pixKey={r.pix_key} />
+                          </div>
                         )}
                         {!r.pix_key && (
                           <p className="text-xs text-destructive">
