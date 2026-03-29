@@ -127,6 +127,47 @@ const RefereeList = () => {
           ÁRBITROS <span className="text-gradient-primary">DISPONÍVEIS</span>
         </motion.h2>
 
+        {!loading && referees.length > 0 && (
+          <div className="flex items-center gap-3 mb-6">
+            <Button onClick={pickRandomReferee} variant="outline" className="gap-2">
+              <Shuffle className="h-4 w-4" /> Escolher aleatório
+            </Button>
+            {randomReferee && (
+              <span className="text-sm text-muted-foreground">
+                Selecionado: <span className="text-foreground font-medium">{randomReferee.profile?.full_name || "Árbitro"}</span>
+              </span>
+            )}
+          </div>
+        )}
+
+        {/* Random referee highlight */}
+        {randomReferee && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="mb-8 p-4 rounded-2xl border-2 border-primary/50 bg-primary/5"
+          >
+            <p className="text-sm font-medium text-primary mb-3 flex items-center gap-2">
+              <Shuffle className="h-4 w-4" /> Árbitro selecionado aleatoriamente
+            </p>
+            <div className="max-w-md">
+              <RefereeCard
+                refereeId={randomReferee.id}
+                name={randomReferee.profile?.full_name || "Árbitro"}
+                region={randomReferee.region || "Não informada"}
+                rating={randomReferee.avgRating}
+                matches={randomReferee.reviewCount}
+                price={randomReferee.price_per_match}
+                fieldTypes={randomReferee.field_types.map((ft) => FIELD_LABELS[ft] || ft)}
+                rawFieldTypes={randomReferee.field_types}
+                competitionLevels={randomReferee.competition_levels}
+                isVerified={randomReferee.is_verified}
+                avatar={getAvatarUrl(randomReferee.profile?.avatar_url, randomReferee.profile?.full_name)}
+              />
+            </div>
+          </motion.div>
+        )}
+
         {loading ? (
           <p className="text-muted-foreground text-center py-8">Carregando árbitros...</p>
         ) : referees.length === 0 ? (
