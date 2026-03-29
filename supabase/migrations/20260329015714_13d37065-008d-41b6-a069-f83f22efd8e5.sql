@@ -1,0 +1,1 @@
+ALTER TABLE public.referees ADD COLUMN pix_key text DEFAULT NULL;
