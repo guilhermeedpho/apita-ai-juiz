@@ -118,9 +118,9 @@ const BookingDialog = ({ refereeId, refereeName, availableFieldTypes }: BookingD
         description: "Você será redirecionado para o pagamento.",
       });
 
-      // 3. Redirect to InfinitePay checkout
+      // 3. Redirect to InfinitePay checkout (use location.href to avoid popup blockers)
       handleClose();
-      window.open(checkoutUrl, "_blank");
+      window.location.href = checkoutUrl;
     } catch (err) {
       console.error("Booking error:", err);
       toast({ title: "Erro ao agendar", variant: "destructive" });
