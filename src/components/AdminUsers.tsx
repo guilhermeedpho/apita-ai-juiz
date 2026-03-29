@@ -41,7 +41,7 @@ const AdminUsers = () => {
 
       const [{ data: profilesData }, { data: refereesData }, { data: rolesData }] = await Promise.all([
         supabase.from("profiles").select("id, user_id, full_name, phone, region, avatar_url, created_at").order("created_at", { ascending: false }),
-        supabase.from("referees").select("id, user_id, is_verified, price_per_match, region, field_types, competition_levels, created_at").order("created_at", { ascending: false }),
+        supabase.from("referees").select("id, user_id, is_verified, price_per_match, region, field_types, competition_levels, created_at, pix_key").order("created_at", { ascending: false }),
         supabase.from("user_roles").select("user_id, role").eq("role", "referee" as any),
       ]);
 
