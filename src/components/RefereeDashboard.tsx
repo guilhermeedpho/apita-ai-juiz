@@ -24,9 +24,39 @@ const STATUS_LABELS: Record<string, { label: string; className: string }> = {
 
 const RefereeDashboard = () => {
   const { user } = useAuth();
+  const { toast } = useToast();
   const [matches, setMatches] = useState<any[]>([]);
   const [stats, setStats] = useState({ total: 0, avgRating: 0, totalEarnings: 0 });
   const [loading, setLoading] = useState(true);
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
+
+  const handleMatchAction = async (matchId: string, action: "confirmed" | "cancelled") => {
+    setActionLoading(matchId);
+    try {
+      const { error } = await supabase
+        .from("matches")
+        .update({ status: action })
+        .eq("id", matchId);
+
+      if (error) {
+        toast({ title: "Erro ao atualizar", description: error.message, variant: "destructive" });
+        return;
+      }
+
+      setMatches((prev) =>
+        prev.map((m) => (m.id === matchId ? { ...m, status: action } : m))
+      );
+
+      toast({
+        title: action === "confirmed" ? "Partida aceita! ✅" : "Partida recusada",
+        description: action === "confirmed" ? "O contratante será notificado." : "A partida foi cancelada.",
+      });
+    } catch {
+      toast({ title: "Erro ao atualizar", variant: "destructive" });
+    } finally {
+      setActionLoading(null);
+    }
+  };
 
   useEffect(() => {
     if (!user) return;
