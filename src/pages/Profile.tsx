@@ -196,6 +196,7 @@ const Profile = () => {
           region: refereeRegion.trim() || null,
           prices_by_field: numericPrices,
           competition_levels: competitionLevels,
+          pix_key: pixKey.trim() || null,
         } as any)
         .eq("user_id", user.id);
 
