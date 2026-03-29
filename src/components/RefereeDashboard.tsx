@@ -187,7 +187,30 @@ const RefereeDashboard = () => {
                       <span className="text-xs text-muted-foreground">
                         Contratante: {m.requesterName} • <span className="text-primary font-medium">R${m.referee_payout}</span>
                       </span>
-                      <ChatDialog matchId={m.id} otherName={m.requesterName} />
+                      <div className="flex items-center gap-2">
+                        {m.status === "pending" && (
+                          <>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="h-7 text-xs border-destructive text-destructive hover:bg-destructive/10"
+                              disabled={actionLoading === m.id}
+                              onClick={() => handleMatchAction(m.id, "cancelled")}
+                            >
+                              {actionLoading === m.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <><X className="h-3 w-3 mr-1" /> Recusar</>}
+                            </Button>
+                            <Button
+                              size="sm"
+                              className="h-7 text-xs"
+                              disabled={actionLoading === m.id}
+                              onClick={() => handleMatchAction(m.id, "confirmed")}
+                            >
+                              {actionLoading === m.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <><Check className="h-3 w-3 mr-1" /> Aceitar</>}
+                            </Button>
+                          </>
+                        )}
+                        <ChatDialog matchId={m.id} otherName={m.requesterName} />
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
