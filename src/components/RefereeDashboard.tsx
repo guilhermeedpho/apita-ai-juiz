@@ -3,8 +3,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { CalendarDays, Star, DollarSign, TrendingUp, MapPin } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { CalendarDays, Star, DollarSign, TrendingUp, MapPin, Check, X, Loader2 } from "lucide-react";
 import ChatDialog from "./ChatDialog";
+import { useToast } from "@/hooks/use-toast";
 
 const FIELD_LABELS: Record<string, string> = {
   society: "Society",
@@ -22,9 +24,39 @@ const STATUS_LABELS: Record<string, { label: string; className: string }> = {
 
 const RefereeDashboard = () => {
   const { user } = useAuth();
+  const { toast } = useToast();
   const [matches, setMatches] = useState<any[]>([]);
   const [stats, setStats] = useState({ total: 0, avgRating: 0, totalEarnings: 0 });
   const [loading, setLoading] = useState(true);
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
+
+  const handleMatchAction = async (matchId: string, action: "confirmed" | "cancelled") => {
+    setActionLoading(matchId);
+    try {
+      const { error } = await supabase
+        .from("matches")
+        .update({ status: action })
+        .eq("id", matchId);
+
+      if (error) {
+        toast({ title: "Erro ao atualizar", description: error.message, variant: "destructive" });
+        return;
+      }
+
+      setMatches((prev) =>
+        prev.map((m) => (m.id === matchId ? { ...m, status: action } : m))
+      );
+
+      toast({
+        title: action === "confirmed" ? "Partida aceita! ✅" : "Partida recusada",
+        description: action === "confirmed" ? "O contratante será notificado." : "A partida foi cancelada.",
+      });
+    } catch {
+      toast({ title: "Erro ao atualizar", variant: "destructive" });
+    } finally {
+      setActionLoading(null);
+    }
+  };
 
   useEffect(() => {
     if (!user) return;
@@ -155,7 +187,30 @@ const RefereeDashboard = () => {
                       <span className="text-xs text-muted-foreground">
                         Contratante: {m.requesterName} • <span className="text-primary font-medium">R${m.referee_payout}</span>
                       </span>
-                      <ChatDialog matchId={m.id} otherName={m.requesterName} />
+                      <div className="flex items-center gap-2">
+                        {m.status === "pending" && (
+                          <>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="h-7 text-xs border-destructive text-destructive hover:bg-destructive/10"
+                              disabled={actionLoading === m.id}
+                              onClick={() => handleMatchAction(m.id, "cancelled")}
+                            >
+                              {actionLoading === m.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <><X className="h-3 w-3 mr-1" /> Recusar</>}
+                            </Button>
+                            <Button
+                              size="sm"
+                              className="h-7 text-xs"
+                              disabled={actionLoading === m.id}
+                              onClick={() => handleMatchAction(m.id, "confirmed")}
+                            >
+                              {actionLoading === m.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <><Check className="h-3 w-3 mr-1" /> Aceitar</>}
+                            </Button>
+                          </>
+                        )}
+                        <ChatDialog matchId={m.id} otherName={m.requesterName} />
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
