@@ -579,6 +579,7 @@ const Profile = () => {
               </p>
             </div>
 
+            <div className="space-y-2">
               <Label>Nível de competição</Label>
               <div className="grid grid-cols-1 gap-3">
                 {COMPETITION_LEVEL_OPTIONS.map((opt) => (
