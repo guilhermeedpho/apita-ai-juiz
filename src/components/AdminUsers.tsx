@@ -25,6 +25,7 @@ interface RefereeWithProfile {
   region: string | null;
   field_types: string[];
   competition_levels: string[];
+  pix_key: string | null;
   created_at: string;
   profile?: UserProfile;
 }
