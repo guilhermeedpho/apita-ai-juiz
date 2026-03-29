@@ -37,7 +37,16 @@ const FIXED_PRICES: Record<string, number> = {
 };
 
 const RefereeList = () => {
+  const { user } = useAuth();
   const [referees, setReferees] = useState<RefereeData[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [randomReferee, setRandomReferee] = useState<RefereeData | null>(null);
+
+  const pickRandomReferee = () => {
+    if (referees.length === 0) return;
+    const random = referees[Math.floor(Math.random() * referees.length)];
+    setRandomReferee(random);
+  };
   const [loading, setLoading] = useState(true);
 
   const getAvatarUrl = (avatarUrl: string | null | undefined, fullName?: string) => {
