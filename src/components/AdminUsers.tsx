@@ -4,8 +4,10 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Users, Search, Camera, Shield } from "lucide-react";
+import { Users, Search, Camera, Shield, Copy, Check } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 
 interface UserProfile {
   id: string;
@@ -29,6 +31,22 @@ interface RefereeWithProfile {
   created_at: string;
   profile?: UserProfile;
 }
+
+const CopyPixButton = ({ pixKey }: { pixKey: string }) => {
+  const [copied, setCopied] = useState(false);
+  const { toast } = useToast();
+  const handleCopy = () => {
+    navigator.clipboard.writeText(pixKey);
+    setCopied(true);
+    toast({ title: "Chave PIX copiada!" });
+    setTimeout(() => setCopied(false), 2000);
+  };
+  return (
+    <button onClick={handleCopy} className="shrink-0 p-0.5 rounded hover:bg-muted transition-colors" title="Copiar PIX">
+      {copied ? <Check className="h-3.5 w-3.5 text-primary" /> : <Copy className="h-3.5 w-3.5 text-muted-foreground" />}
+    </button>
+  );
+};
 
 const AdminUsers = () => {
   const [users, setUsers] = useState<UserProfile[]>([]);
@@ -192,9 +210,12 @@ const AdminUsers = () => {
                           {r.region || r.profile?.region || "Sem região"} • R$ {r.price_per_match}
                         </p>
                         {r.pix_key && (
-                          <p className="text-xs text-primary font-medium truncate">
-                            PIX: {r.pix_key}
-                          </p>
+                          <div className="flex items-center gap-1">
+                            <p className="text-xs text-primary font-medium truncate">
+                              PIX: {r.pix_key}
+                            </p>
+                            <CopyPixButton pixKey={r.pix_key} />
+                          </div>
                         )}
                         {!r.pix_key && (
                           <p className="text-xs text-destructive">
