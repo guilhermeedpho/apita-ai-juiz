@@ -32,6 +32,22 @@ interface RefereeWithProfile {
   profile?: UserProfile;
 }
 
+const CopyPixButton = ({ pixKey }: { pixKey: string }) => {
+  const [copied, setCopied] = useState(false);
+  const { toast } = useToast();
+  const handleCopy = () => {
+    navigator.clipboard.writeText(pixKey);
+    setCopied(true);
+    toast({ title: "Chave PIX copiada!" });
+    setTimeout(() => setCopied(false), 2000);
+  };
+  return (
+    <button onClick={handleCopy} className="shrink-0 p-0.5 rounded hover:bg-muted transition-colors" title="Copiar PIX">
+      {copied ? <Check className="h-3.5 w-3.5 text-primary" /> : <Copy className="h-3.5 w-3.5 text-muted-foreground" />}
+    </button>
+  );
+};
+
 const AdminUsers = () => {
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [referees, setReferees] = useState<RefereeWithProfile[]>([]);
