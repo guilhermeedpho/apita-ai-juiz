@@ -47,7 +47,6 @@ const RefereeList = () => {
     const random = referees[Math.floor(Math.random() * referees.length)];
     setRandomReferee(random);
   };
-  const [loading, setLoading] = useState(true);
 
   const getAvatarUrl = (avatarUrl: string | null | undefined, fullName?: string) => {
     if (avatarUrl) {
