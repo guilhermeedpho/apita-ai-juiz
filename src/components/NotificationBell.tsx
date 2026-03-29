@@ -71,22 +71,14 @@ const NotificationBell = () => {
           // Notify requester when referee accepts/rejects
           if (match.requester_id === user.id && old.status !== match.status) {
             if (match.status === "confirmed") {
-              // Notify about acceptance
               const acceptNotif: Notification = {
                 id: match.id + "-confirmed",
                 message: "Seu árbitro aceitou a partida! ✅",
                 time: new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }),
                 read: false,
               };
-              // Notify about post-match payment
-              const payNotif: Notification = {
-                id: match.id + "-payment-info",
-                message: "💰 Lembrete: o pagamento ao árbitro deve ser realizado após a partida.",
-                time: new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }),
-                read: false,
-              };
-              setNotifications((prev) => [payNotif, acceptNotif, ...prev].slice(0, 20));
-              toast({ title: "Árbitro confirmado! ✅", description: "O pagamento será realizado após a partida." });
+              setNotifications((prev) => [acceptNotif, ...prev].slice(0, 20));
+              toast({ title: "Árbitro confirmado! ✅" });
             } else if (match.status === "cancelled") {
               const notif: Notification = {
                 id: match.id + "-cancelled",
@@ -95,20 +87,32 @@ const NotificationBell = () => {
                 read: false,
               };
               setNotifications((prev) => [notif, ...prev].slice(0, 20));
-              toast({ title: "Partida recusada", description: "O árbitro recusou a partida." });
+              toast({ title: "Partida recusada" });
             }
           }
 
-          // Notify referee when their match is confirmed (payment info)
+          // Notify ADMIN to pay referee after match when status becomes confirmed
+          if (isAdmin && old.status !== match.status && match.status === "confirmed") {
+            const payNotif: Notification = {
+              id: match.id + "-admin-pay",
+              message: `💰 Partida confirmada! Lembre-se de repassar o pagamento ao árbitro após o jogo. (R$ ${match.referee_payout || "?"})`,
+              time: new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }),
+              read: false,
+            };
+            setNotifications((prev) => [payNotif, ...prev].slice(0, 20));
+            toast({ title: "Pagamento pendente", description: "Repasse ao árbitro após a partida." });
+          }
+
+          // Notify referee that payment is after the match
           if (refereeRecordId && match.referee_id === refereeRecordId && old.status !== match.status && match.status === "confirmed") {
             const notif: Notification = {
               id: match.id + "-referee-payment-info",
-              message: "⚽ Partida confirmada! Lembrete: seu pagamento será realizado após o jogo.",
+              message: "⚽ Partida confirmada! Seu pagamento será repassado pelo administrador após o jogo.",
               time: new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }),
               read: false,
             };
             setNotifications((prev) => [notif, ...prev].slice(0, 20));
-            toast({ title: "Partida confirmada!", description: "Seu pagamento será após o jogo." });
+            toast({ title: "Partida confirmada!", description: "Pagamento será após o jogo." });
           }
         }
       )
