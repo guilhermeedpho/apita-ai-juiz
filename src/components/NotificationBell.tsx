@@ -19,6 +19,7 @@ const NotificationBell = () => {
   const { toast } = useToast();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [refereeRecordId, setRefereeRecordId] = useState<string | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   // Fetch referee record ID
   useEffect(() => {
