@@ -32,6 +32,9 @@ const NotificationBell = () => {
       .then(({ data }) => {
         if (data) setRefereeRecordId(data.id);
       });
+    supabase.rpc("has_role", { _user_id: user.id, _role: "admin" as const }).then(({ data }) => {
+      if (data) setIsAdmin(true);
+    });
   }, [user]);
 
   // Subscribe to realtime match changes
