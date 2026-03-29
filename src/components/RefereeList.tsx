@@ -5,7 +5,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Shuffle } from "lucide-react";
 import RefereeCard from "./RefereeCard";
-import BookingDialog from "./BookingDialog";
+import RefereeCardSkeleton from "./RefereeCardSkeleton";
+
 interface RefereeData {
   id: string;
   user_id: string;
@@ -29,22 +30,25 @@ const FIELD_LABELS: Record<string, string> = {
   areia: "Futebol de Areia",
 };
 
-const FIXED_PRICES: Record<string, number> = {
-  society: 130,
-  campo: 200,
-  futsal: 100,
-  areia: 100,
-};
+export interface RefereeFilters {
+  region?: string;
+  fieldType?: string;
+}
 
-const RefereeList = () => {
+interface RefereeListProps {
+  filters?: RefereeFilters;
+}
+
+const RefereeList = ({ filters }: RefereeListProps) => {
   const { user } = useAuth();
   const [referees, setReferees] = useState<RefereeData[]>([]);
   const [loading, setLoading] = useState(true);
   const [randomReferee, setRandomReferee] = useState<RefereeData | null>(null);
 
   const pickRandomReferee = () => {
-    if (referees.length === 0) return;
-    const random = referees[Math.floor(Math.random() * referees.length)];
+    const filtered = getFilteredReferees();
+    if (filtered.length === 0) return;
+    const random = filtered[Math.floor(Math.random() * filtered.length)];
     setRandomReferee(random);
   };
 
@@ -53,18 +57,14 @@ const RefereeList = () => {
       if (avatarUrl.startsWith("http://") || avatarUrl.startsWith("https://")) {
         return avatarUrl;
       }
-
       return supabase.storage.from("avatars").getPublicUrl(avatarUrl).data.publicUrl;
     }
-
     return `https://ui-avatars.com/api/?name=${encodeURIComponent(fullName || "A")}&background=1a1a2e&color=2ecc71&bold=true`;
   };
 
   useEffect(() => {
     const fetchReferees = async () => {
-      const { data: refereesData } = await supabase
-        .from("referees")
-        .select("*");
+      const { data: refereesData } = await supabase.from("referees").select("*");
 
       if (!refereesData || refereesData.length === 0) {
         setLoading(false);
@@ -82,9 +82,7 @@ const RefereeList = () => {
         .from("reviews")
         .select("referee_id, rating");
 
-      const profileMap = new Map(
-        (profiles || []).map((p) => [p.user_id, p])
-      );
+      const profileMap = new Map((profiles || []).map((p) => [p.user_id, p]));
 
       const reviewMap = new Map<string, { count: number; total: number }>();
       (reviews || []).forEach((r) => {
@@ -114,6 +112,26 @@ const RefereeList = () => {
 
     fetchReferees();
   }, []);
+
+  const getFilteredReferees = () => {
+    let filtered = referees;
+
+    if (filters?.region) {
+      filtered = filtered.filter(
+        (r) => r.region?.toLowerCase().includes(filters.region!.toLowerCase())
+      );
+    }
+
+    if (filters?.fieldType) {
+      filtered = filtered.filter((r) =>
+        r.field_types.includes(filters.fieldType!)
+      );
+    }
+
+    return filtered;
+  };
+
+  const filteredReferees = getFilteredReferees();
 
   return (
     <section className="py-16">
@@ -169,12 +187,20 @@ const RefereeList = () => {
         )}
 
         {loading ? (
-          <p className="text-muted-foreground text-center py-8">Carregando árbitros...</p>
-        ) : referees.length === 0 ? (
-          <p className="text-muted-foreground text-center py-8">Nenhum árbitro cadastrado ainda.</p>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <RefereeCardSkeleton key={i} />
+            ))}
+          </div>
+        ) : filteredReferees.length === 0 ? (
+          <p className="text-muted-foreground text-center py-8">
+            {filters?.region || filters?.fieldType
+              ? "Nenhum árbitro encontrado com esses filtros."
+              : "Nenhum árbitro cadastrado ainda."}
+          </p>
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {referees.map((ref) => (
+            {filteredReferees.map((ref) => (
               <RefereeCard
                 key={ref.id}
                 refereeId={ref.id}

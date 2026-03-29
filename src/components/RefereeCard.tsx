@@ -24,6 +24,27 @@ const LEVEL_LABELS: Record<string, string> = {
   profissional: "Profissional",
 };
 
+const StarRating = ({ rating, count }: { rating: number; count: number }) => {
+  return (
+    <div className="flex items-center gap-1.5">
+      <div className="flex items-center gap-0.5">
+        {[1, 2, 3, 4, 5].map((star) => (
+          <Star
+            key={star}
+            className={`h-3.5 w-3.5 ${
+              star <= Math.round(rating)
+                ? "fill-accent text-accent"
+                : "text-muted-foreground/30"
+            }`}
+          />
+        ))}
+      </div>
+      <span className="font-semibold text-sm text-accent">{rating.toFixed(1)}</span>
+      <span className="text-xs text-muted-foreground">({count})</span>
+    </div>
+  );
+};
+
 const RefereeCard = ({
   name,
   region,
@@ -46,7 +67,7 @@ const RefereeCard = ({
       className="bg-gradient-card rounded-2xl border border-border shadow-card overflow-hidden group"
     >
       <div className="p-6">
-        <div className="flex items-start gap-4 mb-4">
+        <div className="flex items-start gap-4 mb-3">
           <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl bg-secondary overflow-hidden flex-shrink-0 ring-1 ring-border">
             <img src={avatar} alt={name} className="w-full h-full object-cover object-center" />
           </div>
@@ -57,14 +78,11 @@ const RefereeCard = ({
                 <ShieldCheck className="h-4 w-4 text-primary flex-shrink-0" />
               )}
             </div>
-            <div className="flex items-center gap-1 text-sm text-muted-foreground">
+            <div className="flex items-center gap-1 text-sm text-muted-foreground mb-1">
               <MapPin className="h-3.5 w-3.5" />
               <span>{region}</span>
             </div>
-          </div>
-          <div className="flex items-center gap-1 text-accent">
-            <Star className="h-4 w-4 fill-current" />
-            <span className="font-semibold text-sm">{rating.toFixed(1)}</span>
+            <StarRating rating={rating} count={matches} />
           </div>
         </div>
 
@@ -92,7 +110,7 @@ const RefereeCard = ({
 
         <div className="flex items-center gap-1 text-sm text-muted-foreground mb-4">
           <Clock className="h-3.5 w-3.5" />
-          <span>{matches} partidas realizadas</span>
+          <span>{matches} {matches === 1 ? "avaliação" : "avaliações"}</span>
         </div>
 
         <div className="flex items-center justify-between">
