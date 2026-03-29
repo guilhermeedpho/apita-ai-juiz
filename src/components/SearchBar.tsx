@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Calendar } from "lucide-react";
+import { Calendar, Search, X } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar as CalendarComp } from "@/components/ui/calendar";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
+import type { RefereeFilters } from "./RefereeList";
 
 const regions = [
   "Zona Norte", "Zona Sul", "Zona Leste", "Zona Oeste", "Centro",
@@ -15,12 +16,32 @@ const regions = [
 
 const fieldTypes = [
   { value: "society", label: "Society" },
-  { value: "profissional", label: "Campo Profissional" },
-  { value: "quadra", label: "Quadra" },
+  { value: "campo", label: "Campo (11x11)" },
+  { value: "futsal", label: "Futsal" },
+  { value: "areia", label: "Futebol de Areia" },
 ];
 
-const SearchBar = () => {
+interface SearchBarProps {
+  onFilter?: (filters: RefereeFilters) => void;
+}
+
+const SearchBar = ({ onFilter }: SearchBarProps) => {
   const [date, setDate] = useState<Date>();
+  const [region, setRegion] = useState("");
+  const [fieldType, setFieldType] = useState("");
+
+  const handleSearch = () => {
+    onFilter?.({ region: region || undefined, fieldType: fieldType || undefined });
+  };
+
+  const handleClear = () => {
+    setRegion("");
+    setFieldType("");
+    setDate(undefined);
+    onFilter?.({});
+  };
+
+  const hasFilters = region || fieldType;
 
   return (
     <section className="py-12">
@@ -28,18 +49,18 @@ const SearchBar = () => {
         <div className="bg-gradient-card rounded-2xl p-6 md:p-8 shadow-card border border-border">
           <h3 className="text-2xl font-display mb-6 text-gradient-primary">ENCONTRE SEU ÁRBITRO</h3>
           <div className="grid md:grid-cols-4 gap-4">
-            <Select>
+            <Select value={region} onValueChange={setRegion}>
               <SelectTrigger className="h-12 bg-secondary border-border">
                 <SelectValue placeholder="Região" />
               </SelectTrigger>
               <SelectContent>
                 {regions.map((r) => (
-                  <SelectItem key={r} value={r.toLowerCase()}>{r}</SelectItem>
+                  <SelectItem key={r} value={r}>{r}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
 
-            <Select>
+            <Select value={fieldType} onValueChange={setFieldType}>
               <SelectTrigger className="h-12 bg-secondary border-border">
                 <SelectValue placeholder="Tipo de Campo" />
               </SelectTrigger>
@@ -74,9 +95,16 @@ const SearchBar = () => {
               </PopoverContent>
             </Popover>
 
-            <Button className="h-12 text-base font-semibold">
-              Buscar
-            </Button>
+            <div className="flex gap-2">
+              <Button className="h-12 text-base font-semibold flex-1 gap-2" onClick={handleSearch}>
+                <Search className="h-4 w-4" /> Buscar
+              </Button>
+              {hasFilters && (
+                <Button variant="outline" className="h-12" onClick={handleClear}>
+                  <X className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
           </div>
         </div>
       </div>

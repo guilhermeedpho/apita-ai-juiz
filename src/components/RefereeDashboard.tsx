@@ -4,8 +4,9 @@ import { useAuth } from "@/hooks/useAuth";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { CalendarDays, Star, DollarSign, TrendingUp, MapPin, Check, X, Loader2 } from "lucide-react";
+import { CalendarDays, Star, DollarSign, MapPin, Check, X, Loader2 } from "lucide-react";
 import ChatDialog from "./ChatDialog";
+import RefereeFinancials from "./RefereeFinancials";
 import { useToast } from "@/hooks/use-toast";
 
 const FIELD_LABELS: Record<string, string> = {
@@ -62,7 +63,6 @@ const RefereeDashboard = () => {
     if (!user) return;
 
     const fetchData = async () => {
-      // Get referee record
       const { data: referee } = await supabase
         .from("referees")
         .select("id")
@@ -74,14 +74,12 @@ const RefereeDashboard = () => {
         return;
       }
 
-      // Fetch matches
       const { data: matchesData } = await supabase
         .from("matches")
         .select("*")
         .eq("referee_id", referee.id)
         .order("scheduled_at", { ascending: false });
 
-      // Fetch requester names
       const reqIds = [...new Set((matchesData || []).map((m) => m.requester_id))];
       const { data: profiles } = await supabase
         .from("profiles")
@@ -97,7 +95,6 @@ const RefereeDashboard = () => {
 
       setMatches(enriched);
 
-      // Fetch reviews for stats
       const { data: reviews } = await supabase
         .from("reviews")
         .select("rating")
@@ -156,6 +153,9 @@ const RefereeDashboard = () => {
             </CardContent>
           </Card>
         </div>
+
+        {/* Financial chart */}
+        <RefereeFinancials matches={matches} />
 
         {/* Matches list */}
         <h3 className="text-2xl font-display mb-4">SUAS PARTIDAS</h3>

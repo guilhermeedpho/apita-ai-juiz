@@ -4,6 +4,7 @@ import { Shield, LogOut, User, ShieldCheck } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import NotificationBell from "./NotificationBell";
 
 const Navbar = () => {
   const { user, signOut } = useAuth();
@@ -23,9 +24,10 @@ const Navbar = () => {
           <Shield className="h-7 w-7 text-primary" />
           <span className="font-display text-2xl tracking-wide">APITAJÁ</span>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           {user ? (
             <>
+              <NotificationBell />
               {isAdmin && (
                 <Button variant="ghost" size="sm" onClick={() => navigate("/admin")} className="font-medium">
                   <ShieldCheck className="h-4 w-4 mr-1" />

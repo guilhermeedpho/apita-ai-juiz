@@ -6,6 +6,7 @@ import Hero from "@/components/Hero";
 import SearchBar from "@/components/SearchBar";
 import HowItWorks from "@/components/HowItWorks";
 import RefereeList from "@/components/RefereeList";
+import type { RefereeFilters } from "@/components/RefereeList";
 import RefereeDashboard from "@/components/RefereeDashboard";
 import Footer from "@/components/Footer";
 
@@ -13,6 +14,7 @@ const Index = () => {
   const { user } = useAuth();
   const [isReferee, setIsReferee] = useState(false);
   const [checked, setChecked] = useState(false);
+  const [filters, setFilters] = useState<RefereeFilters>({});
 
   useEffect(() => {
     if (!user) {
@@ -36,7 +38,6 @@ const Index = () => {
     );
   }
 
-  // Referee view: dashboard with distinct blue theme
   if (isReferee) {
     return (
       <div className="min-h-screen referee-theme bg-background">
@@ -49,13 +50,12 @@ const Index = () => {
     );
   }
 
-  // Player/visitor view
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
       <Hero />
-      <SearchBar />
-      <RefereeList />
+      <SearchBar onFilter={setFilters} />
+      <RefereeList filters={filters} />
       <HowItWorks />
       <Footer />
     </div>
