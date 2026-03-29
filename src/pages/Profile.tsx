@@ -566,6 +566,19 @@ const Profile = () => {
             </div>
 
             <div className="space-y-2">
+              <Label className="flex items-center gap-1">
+                <DollarSign className="h-3.5 w-3.5" /> Chave PIX para recebimento *
+              </Label>
+              <Input
+                value={pixKey}
+                onChange={(e) => setPixKey(e.target.value)}
+                placeholder="CPF, e-mail, telefone ou chave aleatória"
+              />
+              <p className="text-xs text-muted-foreground">
+                Informe sua chave PIX para receber os pagamentos das partidas.
+              </p>
+            </div>
+
               <Label>Nível de competição</Label>
               <div className="grid grid-cols-1 gap-3">
                 {COMPETITION_LEVEL_OPTIONS.map((opt) => (

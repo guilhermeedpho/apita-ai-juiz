@@ -191,6 +191,16 @@ const AdminUsers = () => {
                         <p className="text-xs text-muted-foreground">
                           {r.region || r.profile?.region || "Sem região"} • R$ {r.price_per_match}
                         </p>
+                        {r.pix_key && (
+                          <p className="text-xs text-primary font-medium truncate">
+                            PIX: {r.pix_key}
+                          </p>
+                        )}
+                        {!r.pix_key && (
+                          <p className="text-xs text-destructive">
+                            ⚠️ Sem chave PIX
+                          </p>
+                        )}
                         {r.field_types.length > 0 && (
                           <p className="text-xs text-muted-foreground truncate">
                             {r.field_types.join(", ")}
