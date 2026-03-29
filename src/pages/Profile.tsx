@@ -112,6 +112,7 @@ const Profile = () => {
         setIsReferee(true);
         setFieldTypes(data.field_types || []);
         setRefereeRegion(data.region || "");
+        setPixKey((data as any).pix_key || "");
         setCompetitionLevels((data as any).competition_levels || []);
       }
     };
