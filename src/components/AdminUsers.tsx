@@ -25,6 +25,7 @@ interface RefereeWithProfile {
   region: string | null;
   field_types: string[];
   competition_levels: string[];
+  pix_key: string | null;
   created_at: string;
   profile?: UserProfile;
 }
@@ -41,7 +42,7 @@ const AdminUsers = () => {
 
       const [{ data: profilesData }, { data: refereesData }, { data: rolesData }] = await Promise.all([
         supabase.from("profiles").select("id, user_id, full_name, phone, region, avatar_url, created_at").order("created_at", { ascending: false }),
-        supabase.from("referees").select("id, user_id, is_verified, price_per_match, region, field_types, competition_levels, created_at").order("created_at", { ascending: false }),
+        supabase.from("referees").select("id, user_id, is_verified, price_per_match, region, field_types, competition_levels, created_at, pix_key").order("created_at", { ascending: false }),
         supabase.from("user_roles").select("user_id, role").eq("role", "referee" as any),
       ]);
 
@@ -190,6 +191,16 @@ const AdminUsers = () => {
                         <p className="text-xs text-muted-foreground">
                           {r.region || r.profile?.region || "Sem região"} • R$ {r.price_per_match}
                         </p>
+                        {r.pix_key && (
+                          <p className="text-xs text-primary font-medium truncate">
+                            PIX: {r.pix_key}
+                          </p>
+                        )}
+                        {!r.pix_key && (
+                          <p className="text-xs text-destructive">
+                            ⚠️ Sem chave PIX
+                          </p>
+                        )}
                         {r.field_types.length > 0 && (
                           <p className="text-xs text-muted-foreground truncate">
                             {r.field_types.join(", ")}

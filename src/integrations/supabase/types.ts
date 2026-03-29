@@ -184,6 +184,7 @@ export type Database = {
           field_types: string[]
           id: string
           is_verified: boolean
+          pix_key: string | null
           price_per_match: number
           prices_by_field: Json
           region: string | null
@@ -196,6 +197,7 @@ export type Database = {
           field_types?: string[]
           id?: string
           is_verified?: boolean
+          pix_key?: string | null
           price_per_match?: number
           prices_by_field?: Json
           region?: string | null
@@ -208,6 +210,7 @@ export type Database = {
           field_types?: string[]
           id?: string
           is_verified?: boolean
+          pix_key?: string | null
           price_per_match?: number
           prices_by_field?: Json
           region?: string | null

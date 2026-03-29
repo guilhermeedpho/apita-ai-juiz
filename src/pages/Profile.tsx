@@ -67,6 +67,7 @@ const Profile = () => {
   const [fieldTypes, setFieldTypes] = useState<string[]>([]);
   // Prices are now fixed per field type
   const [refereeRegion, setRefereeRegion] = useState("");
+  const [pixKey, setPixKey] = useState("");
   const [competitionLevels, setCompetitionLevels] = useState<string[]>([]);
   const [savingReferee, setSavingReferee] = useState(false);
   const [refereeError, setRefereeError] = useState<string | null>(null);
@@ -111,6 +112,7 @@ const Profile = () => {
         setIsReferee(true);
         setFieldTypes(data.field_types || []);
         setRefereeRegion(data.region || "");
+        setPixKey((data as any).pix_key || "");
         setCompetitionLevels((data as any).competition_levels || []);
       }
     };
@@ -194,6 +196,7 @@ const Profile = () => {
           region: refereeRegion.trim() || null,
           prices_by_field: numericPrices,
           competition_levels: competitionLevels,
+          pix_key: pixKey.trim() || null,
         } as any)
         .eq("user_id", user.id);
 
@@ -214,6 +217,7 @@ const Profile = () => {
           region: refereeRegion.trim() || null,
           prices_by_field: numericPrices,
           competition_levels: competitionLevels,
+          pix_key: pixKey.trim() || null,
         } as any);
 
       if (!error) {
@@ -559,6 +563,20 @@ const Profile = () => {
                 onChange={(e) => setRefereeRegion(e.target.value)}
                 placeholder="São Paulo - Zona Sul"
               />
+            </div>
+
+            <div className="space-y-2">
+              <Label className="flex items-center gap-1">
+                <DollarSign className="h-3.5 w-3.5" /> Chave PIX para recebimento *
+              </Label>
+              <Input
+                value={pixKey}
+                onChange={(e) => setPixKey(e.target.value)}
+                placeholder="CPF, e-mail, telefone ou chave aleatória"
+              />
+              <p className="text-xs text-muted-foreground">
+                Informe sua chave PIX para receber os pagamentos das partidas.
+              </p>
             </div>
 
             <div className="space-y-2">
