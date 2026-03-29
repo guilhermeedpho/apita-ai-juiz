@@ -13,70 +13,93 @@ Deno.serve(async (req) => {
   try {
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) {
-      return new Response(JSON.stringify({ error: "No authorization" }), { status: 401, headers: corsHeaders });
+      console.error("No authorization header");
+      return new Response(JSON.stringify({ error: "No authorization" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
 
-    const userClient = createClient(supabaseUrl, Deno.env.get("SUPABASE_ANON_KEY")!, {
+    // Get user from token
+    const userClient = createClient(supabaseUrl, anonKey, {
       global: { headers: { Authorization: authHeader } },
     });
 
     const { data: { user }, error: userError } = await userClient.auth.getUser();
     if (userError || !user) {
-      return new Response(JSON.stringify({ error: "Invalid token" }), { status: 401, headers: corsHeaders });
+      console.error("Invalid token:", userError?.message);
+      return new Response(JSON.stringify({ error: "Invalid token" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
+    console.log("Deleting account for user:", user.id);
     const adminClient = createClient(supabaseUrl, serviceRoleKey);
 
-    // Get referee id if user is a referee
+    // Get referee id if exists
     const { data: referee } = await adminClient.from("referees").select("id").eq("user_id", user.id).maybeSingle();
+    console.log("Referee record:", referee);
 
-    // Get all match IDs where user is requester or referee (to delete related messages)
+    // Collect all match IDs involving this user
     const matchIds: string[] = [];
     const { data: requesterMatches } = await adminClient.from("matches").select("id").eq("requester_id", user.id);
     if (requesterMatches) matchIds.push(...requesterMatches.map(m => m.id));
-    
+
     if (referee) {
       const { data: refereeMatches } = await adminClient.from("matches").select("id").eq("referee_id", referee.id);
       if (refereeMatches) matchIds.push(...refereeMatches.map(m => m.id));
     }
+    console.log("Match IDs to clean:", matchIds.length);
 
-    // Delete ALL messages on user's matches (including from other users)
+    // Delete messages on user's matches
     if (matchIds.length > 0) {
-      await adminClient.from("messages").delete().in("match_id", matchIds);
+      const { error: msgErr } = await adminClient.from("messages").delete().in("match_id", matchIds);
+      if (msgErr) console.error("Error deleting match messages:", msgErr.message);
     }
-    // Also delete messages sent by user in other matches
-    await adminClient.from("messages").delete().eq("sender_id", user.id);
+    // Delete messages sent by user elsewhere
+    const { error: msgErr2 } = await adminClient.from("messages").delete().eq("sender_id", user.id);
+    if (msgErr2) console.error("Error deleting sender messages:", msgErr2.message);
 
-    // Delete reviews: by reviewer AND reviews about this referee
-    await adminClient.from("reviews").delete().eq("reviewer_id", user.id);
+    // Delete reviews
+    const { error: revErr1 } = await adminClient.from("reviews").delete().eq("reviewer_id", user.id);
+    if (revErr1) console.error("Error deleting reviewer reviews:", revErr1.message);
     if (referee) {
-      await adminClient.from("reviews").delete().eq("referee_id", referee.id);
+      const { error: revErr2 } = await adminClient.from("reviews").delete().eq("referee_id", referee.id);
+      if (revErr2) console.error("Error deleting referee reviews:", revErr2.message);
     }
 
-    // Now safe to delete matches
+    // Delete matches
     if (referee) {
-      await adminClient.from("matches").delete().eq("referee_id", referee.id);
+      const { error: mErr1 } = await adminClient.from("matches").delete().eq("referee_id", referee.id);
+      if (mErr1) console.error("Error deleting referee matches:", mErr1.message);
     }
-    await adminClient.from("matches").delete().eq("requester_id", user.id);
+    const { error: mErr2 } = await adminClient.from("matches").delete().eq("requester_id", user.id);
+    if (mErr2) console.error("Error deleting requester matches:", mErr2.message);
 
     // Delete remaining data
-    await adminClient.from("referees").delete().eq("user_id", user.id);
-    await adminClient.from("identity_verifications").delete().eq("user_id", user.id);
-    await adminClient.from("support_messages").delete().eq("user_id", user.id);
-    await adminClient.from("user_roles").delete().eq("user_id", user.id);
-    await adminClient.from("profiles").delete().eq("user_id", user.id);
+    const tables = [
+      { table: "referees", col: "user_id" },
+      { table: "identity_verifications", col: "user_id" },
+      { table: "support_messages", col: "user_id" },
+      { table: "user_roles", col: "user_id" },
+      { table: "profiles", col: "user_id" },
+    ];
+
+    for (const { table, col } of tables) {
+      const { error } = await adminClient.from(table).delete().eq(col, user.id);
+      if (error) console.error(`Error deleting from ${table}:`, error.message);
+    }
 
     // Delete auth user
     const { error: deleteError } = await adminClient.auth.admin.deleteUser(user.id);
     if (deleteError) {
-      return new Response(JSON.stringify({ error: deleteError.message }), { status: 500, headers: corsHeaders });
+      console.error("Error deleting auth user:", deleteError.message);
+      return new Response(JSON.stringify({ error: deleteError.message }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
-    return new Response(JSON.stringify({ success: true }), { headers: corsHeaders });
+    console.log("Account deleted successfully");
+    return new Response(JSON.stringify({ success: true }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
   } catch (err) {
-    return new Response(JSON.stringify({ error: String(err) }), { status: 500, headers: corsHeaders });
+    console.error("Unexpected error:", err);
+    return new Response(JSON.stringify({ error: String(err) }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
   }
 });
