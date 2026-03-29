@@ -67,6 +67,7 @@ const Profile = () => {
   const [fieldTypes, setFieldTypes] = useState<string[]>([]);
   // Prices are now fixed per field type
   const [refereeRegion, setRefereeRegion] = useState("");
+  const [pixKey, setPixKey] = useState("");
   const [competitionLevels, setCompetitionLevels] = useState<string[]>([]);
   const [savingReferee, setSavingReferee] = useState(false);
   const [refereeError, setRefereeError] = useState<string | null>(null);
