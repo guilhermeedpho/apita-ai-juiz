@@ -3,8 +3,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { CalendarDays, Star, DollarSign, TrendingUp, MapPin } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { CalendarDays, Star, DollarSign, TrendingUp, MapPin, Check, X, Loader2 } from "lucide-react";
 import ChatDialog from "./ChatDialog";
+import { useToast } from "@/hooks/use-toast";
 
 const FIELD_LABELS: Record<string, string> = {
   society: "Society",
