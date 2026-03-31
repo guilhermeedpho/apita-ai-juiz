@@ -33,6 +33,7 @@ const FIELD_LABELS: Record<string, string> = {
 export interface RefereeFilters {
   region?: string;
   fieldType?: string;
+  location?: string;
 }
 
 interface RefereeListProps {

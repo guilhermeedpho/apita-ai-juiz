@@ -8,6 +8,7 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import type { RefereeFilters } from "./RefereeList";
+import { Input } from "@/components/ui/input";
 
 const regions = [
   "Zona Norte", "Zona Sul", "Zona Leste", "Zona Oeste", "Centro",
