@@ -12,6 +12,10 @@ import type { RefereeFilters } from "./RefereeList";
 const regions = [
   "Zona Norte", "Zona Sul", "Zona Leste", "Zona Oeste", "Centro",
   "ABC Paulista", "Guarulhos", "Osasco",
+  "Itaquera", "São Mateus", "Penha", "Tatuapé", "Mooca",
+  "Santana", "Tucuruvi", "Vila Maria",
+  "Santo Amaro", "Interlagos", "Capão Redondo",
+  "Pinheiros", "Butantã", "Lapa",
 ];
 
 const fieldTypes = [
