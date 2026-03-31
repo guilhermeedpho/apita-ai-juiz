@@ -8,7 +8,7 @@ import HowItWorks from "@/components/HowItWorks";
 import RefereeList from "@/components/RefereeList";
 import type { RefereeFilters } from "@/components/RefereeList";
 import RefereeDashboard from "@/components/RefereeDashboard";
-import RefereeMap from "@/components/RefereeMap";
+import RefereeMapWrapper from "@/components/RefereeMapWrapper";
 import Footer from "@/components/Footer";
 
 const Index = () => {
