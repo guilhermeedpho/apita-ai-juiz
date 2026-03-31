@@ -55,8 +55,16 @@ const SearchBar = ({ onFilter }: SearchBarProps) => {
       <div className="container mx-auto px-4">
         <div className="bg-gradient-card rounded-2xl p-6 md:p-8 shadow-card border border-border">
           <h3 className="text-2xl font-display mb-6 text-gradient-primary">ENCONTRE SEU ÁRBITRO</h3>
-          <div className="grid md:grid-cols-4 gap-4">
-            <Select value={region} onValueChange={setRegion}>
+          <div className="grid md:grid-cols-5 gap-4">
+            <div className="relative">
+              <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Local da quadra (ex: Arena 90)"
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+                className="h-12 bg-secondary border-border pl-10"
+              />
+            </div>
               <SelectTrigger className="h-12 bg-secondary border-border">
                 <SelectValue placeholder="Região" />
               </SelectTrigger>
