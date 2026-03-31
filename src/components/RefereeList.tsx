@@ -129,6 +129,14 @@ const RefereeList = ({ filters }: RefereeListProps) => {
       );
     }
 
+    if (filters?.location) {
+      const loc = filters.location.toLowerCase();
+      filtered = filtered.filter(
+        (r) => r.region?.toLowerCase().includes(loc) ||
+               r.profile?.full_name?.toLowerCase().includes(loc)
+      );
+    }
+
     return filtered;
   };
 
