@@ -34,19 +34,21 @@ const SearchBar = ({ onFilter }: SearchBarProps) => {
   const [date, setDate] = useState<Date>();
   const [region, setRegion] = useState("");
   const [fieldType, setFieldType] = useState("");
+  const [location, setLocation] = useState("");
 
   const handleSearch = () => {
-    onFilter?.({ region: region || undefined, fieldType: fieldType || undefined });
+    onFilter?.({ region: region || undefined, fieldType: fieldType || undefined, location: location || undefined });
   };
 
   const handleClear = () => {
     setRegion("");
     setFieldType("");
+    setLocation("");
     setDate(undefined);
     onFilter?.({});
   };
 
-  const hasFilters = region || fieldType;
+  const hasFilters = region || fieldType || location;
 
   return (
     <section className="py-12">
