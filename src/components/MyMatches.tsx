@@ -19,6 +19,7 @@ interface MatchData {
   price: number;
   referee_id: string;
   requester_id: string;
+  payment_nsu: string | null;
   refereeName?: string;
   requesterName?: string;
 }
