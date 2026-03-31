@@ -3,8 +3,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { CalendarDays, MapPin } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { CalendarDays, MapPin, CreditCard } from "lucide-react";
 import ChatDialog from "./ChatDialog";
+
+const INFINITEPAY_HANDLE = "nagattoclimatizacoes";
 
 interface MatchData {
   id: string;
