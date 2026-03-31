@@ -56,7 +56,7 @@ const Index = () => {
       <Navbar />
       <Hero />
       <SearchBar onFilter={setFilters} />
-      <RefereeMap />
+      <RefereeMapWrapper />
       <RefereeList filters={filters} />
       <HowItWorks />
       <Footer />
