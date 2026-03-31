@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Calendar, MapPin, Search, X } from "lucide-react";
@@ -17,6 +17,7 @@ const regions = [
   "Santana", "Tucuruvi", "Vila Maria",
   "Santo Amaro", "Interlagos", "Capão Redondo",
   "Pinheiros", "Butantã", "Lapa",
+  "São Paulo",
 ];
 
 const fieldTypes = [
@@ -36,16 +37,20 @@ const SearchBar = ({ onFilter }: SearchBarProps) => {
   const [fieldType, setFieldType] = useState("");
   const [location, setLocation] = useState("");
 
-  const handleSearch = () => {
-    onFilter?.({ region: region || undefined, fieldType: fieldType || undefined, location: location || undefined });
-  };
+  // Auto-filter as user types or selects
+  useEffect(() => {
+    onFilter?.({
+      region: region || undefined,
+      fieldType: fieldType || undefined,
+      location: location || undefined,
+    });
+  }, [region, fieldType, location]);
 
   const handleClear = () => {
     setRegion("");
     setFieldType("");
     setLocation("");
     setDate(undefined);
-    onFilter?.({});
   };
 
   const hasFilters = region || fieldType || location;
@@ -55,11 +60,11 @@ const SearchBar = ({ onFilter }: SearchBarProps) => {
       <div className="container mx-auto px-4">
         <div className="bg-gradient-card rounded-2xl p-6 md:p-8 shadow-card border border-border">
           <h3 className="text-2xl font-display mb-6 text-gradient-primary">ENCONTRE SEU ÁRBITRO</h3>
-          <div className="grid md:grid-cols-5 gap-4">
-            <div className="relative">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4">
+            <div className="relative sm:col-span-2 md:col-span-1">
               <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Local da quadra (ex: Arena 90)"
+                placeholder="Local ou nome (ex: Arena 90)"
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
                 className="h-12 bg-secondary border-border pl-10"
@@ -67,7 +72,7 @@ const SearchBar = ({ onFilter }: SearchBarProps) => {
             </div>
             <Select value={region} onValueChange={setRegion}>
               <SelectTrigger className="h-12 bg-secondary border-border">
-                <SelectValue placeholder="Região" />
+                <SelectValue placeholder="Região de atuação" />
               </SelectTrigger>
               <SelectContent>
                 {regions.map((r) => (
@@ -112,13 +117,15 @@ const SearchBar = ({ onFilter }: SearchBarProps) => {
             </Popover>
 
             <div className="flex gap-2">
-              <Button className="h-12 text-base font-semibold flex-1 gap-2" onClick={handleSearch}>
-                <Search className="h-4 w-4" /> Buscar
-              </Button>
               {hasFilters && (
-                <Button variant="outline" className="h-12" onClick={handleClear}>
-                  <X className="h-4 w-4" />
+                <Button variant="outline" className="h-12 flex-1 gap-2" onClick={handleClear}>
+                  <X className="h-4 w-4" /> Limpar
                 </Button>
+              )}
+              {!hasFilters && (
+                <div className="h-12 flex items-center text-sm text-muted-foreground px-2">
+                  <Search className="h-4 w-4 mr-2" /> Filtra automaticamente
+                </div>
               )}
             </div>
           </div>
