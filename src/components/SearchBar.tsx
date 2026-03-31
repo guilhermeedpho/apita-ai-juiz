@@ -65,6 +65,7 @@ const SearchBar = ({ onFilter }: SearchBarProps) => {
                 className="h-12 bg-secondary border-border pl-10"
               />
             </div>
+            <Select value={region} onValueChange={setRegion}>
               <SelectTrigger className="h-12 bg-secondary border-border">
                 <SelectValue placeholder="Região" />
               </SelectTrigger>
