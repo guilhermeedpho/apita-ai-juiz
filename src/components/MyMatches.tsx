@@ -3,8 +3,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { CalendarDays, MapPin } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { CalendarDays, MapPin, CreditCard } from "lucide-react";
 import ChatDialog from "./ChatDialog";
+
+const INFINITEPAY_HANDLE = "nagattoclimatizacoes";
 
 interface MatchData {
   id: string;
@@ -16,6 +19,7 @@ interface MatchData {
   price: number;
   referee_id: string;
   requester_id: string;
+  payment_nsu: string | null;
   refereeName?: string;
   requesterName?: string;
 }
@@ -159,7 +163,29 @@ const MyMatches = () => {
                     <span className="text-xs text-muted-foreground">
                       {isRequester ? `Árbitro: ${otherName}` : `Contratante: ${otherName}`}
                     </span>
-                    <ChatDialog matchId={m.id} otherName={otherName} />
+                    <div className="flex items-center gap-2">
+                      {isRequester && m.status === "pending" && (
+                        <Button
+                          size="sm"
+                          variant="default"
+                          className="text-xs gap-1"
+                          onClick={() => {
+                            const nsu = m.payment_nsu || `APITAJA-${m.id.slice(0, 8).toUpperCase()}`;
+                            const redirectUrl = `${window.location.origin}/pagamento-confirmado?match_id=${m.id}&nsu=${nsu}`;
+                            const items = [{
+                              name: `Árbitro - ${FIELD_LABELS[m.field_type] || m.field_type} ${m.duration}min`,
+                              price: m.price * 100,
+                              quantity: 1,
+                            }];
+                            const checkoutUrl = `https://checkout.infinitepay.io/${INFINITEPAY_HANDLE}?items=${encodeURIComponent(JSON.stringify(items))}&order_nsu=${nsu}&redirect_url=${encodeURIComponent(redirectUrl)}`;
+                            window.location.href = checkoutUrl;
+                          }}
+                        >
+                          <CreditCard className="h-3 w-3" /> Pagar
+                        </Button>
+                      )}
+                      <ChatDialog matchId={m.id} otherName={otherName} />
+                    </div>
                   </div>
                 </div>
               );
