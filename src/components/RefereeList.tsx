@@ -114,13 +114,19 @@ const RefereeList = ({ filters }: RefereeListProps) => {
     fetchReferees();
   }, []);
 
+  const normalize = (s: string) =>
+    s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
   const getFilteredReferees = () => {
     let filtered = referees;
 
     if (filters?.region) {
-      filtered = filtered.filter(
-        (r) => r.region?.toLowerCase().includes(filters.region!.toLowerCase())
-      );
+      const regionNorm = normalize(filters.region);
+      filtered = filtered.filter((r) => {
+        if (!r.region) return false;
+        const refRegion = normalize(r.region);
+        return refRegion.includes(regionNorm) || regionNorm.includes(refRegion);
+      });
     }
 
     if (filters?.fieldType) {
@@ -130,10 +136,11 @@ const RefereeList = ({ filters }: RefereeListProps) => {
     }
 
     if (filters?.location) {
-      const loc = filters.location.toLowerCase();
+      const loc = normalize(filters.location);
       filtered = filtered.filter(
-        (r) => r.region?.toLowerCase().includes(loc) ||
-               r.profile?.full_name?.toLowerCase().includes(loc)
+        (r) =>
+          (r.region && normalize(r.region).includes(loc)) ||
+          (r.profile?.full_name && normalize(r.profile.full_name).includes(loc))
       );
     }
 
