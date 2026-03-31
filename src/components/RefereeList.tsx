@@ -33,6 +33,7 @@ const FIELD_LABELS: Record<string, string> = {
 export interface RefereeFilters {
   region?: string;
   fieldType?: string;
+  location?: string;
 }
 
 interface RefereeListProps {
@@ -125,6 +126,14 @@ const RefereeList = ({ filters }: RefereeListProps) => {
     if (filters?.fieldType) {
       filtered = filtered.filter((r) =>
         r.field_types.includes(filters.fieldType!)
+      );
+    }
+
+    if (filters?.location) {
+      const loc = filters.location.toLowerCase();
+      filtered = filtered.filter(
+        (r) => r.region?.toLowerCase().includes(loc) ||
+               r.profile?.full_name?.toLowerCase().includes(loc)
       );
     }
 

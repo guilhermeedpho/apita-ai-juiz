@@ -1,13 +1,14 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Calendar, Search, X } from "lucide-react";
+import { Calendar, MapPin, Search, X } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar as CalendarComp } from "@/components/ui/calendar";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import type { RefereeFilters } from "./RefereeList";
+import { Input } from "@/components/ui/input";
 
 const regions = [
   "Zona Norte", "Zona Sul", "Zona Leste", "Zona Oeste", "Centro",
@@ -33,26 +34,37 @@ const SearchBar = ({ onFilter }: SearchBarProps) => {
   const [date, setDate] = useState<Date>();
   const [region, setRegion] = useState("");
   const [fieldType, setFieldType] = useState("");
+  const [location, setLocation] = useState("");
 
   const handleSearch = () => {
-    onFilter?.({ region: region || undefined, fieldType: fieldType || undefined });
+    onFilter?.({ region: region || undefined, fieldType: fieldType || undefined, location: location || undefined });
   };
 
   const handleClear = () => {
     setRegion("");
     setFieldType("");
+    setLocation("");
     setDate(undefined);
     onFilter?.({});
   };
 
-  const hasFilters = region || fieldType;
+  const hasFilters = region || fieldType || location;
 
   return (
     <section className="py-12">
       <div className="container mx-auto px-4">
         <div className="bg-gradient-card rounded-2xl p-6 md:p-8 shadow-card border border-border">
           <h3 className="text-2xl font-display mb-6 text-gradient-primary">ENCONTRE SEU ÁRBITRO</h3>
-          <div className="grid md:grid-cols-4 gap-4">
+          <div className="grid md:grid-cols-5 gap-4">
+            <div className="relative">
+              <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Local da quadra (ex: Arena 90)"
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+                className="h-12 bg-secondary border-border pl-10"
+              />
+            </div>
             <Select value={region} onValueChange={setRegion}>
               <SelectTrigger className="h-12 bg-secondary border-border">
                 <SelectValue placeholder="Região" />
