@@ -59,12 +59,9 @@ const SearchBar = ({ onFilter }: SearchBarProps) => {
     setFieldType("");
     setLocation("");
     setDate(undefined);
-    setMinPrice("");
-    setMaxPrice("");
-    setMinRating("");
   };
 
-  const hasFilters = region || fieldType || location || minPrice || maxPrice || minRating;
+  const hasFilters = region || fieldType || location;
 
   return (
     <section className="py-12">
