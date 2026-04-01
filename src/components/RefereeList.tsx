@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Shuffle } from "lucide-react";
+import { matchesLocationQuery, normalizeLocationText } from "@/lib/location-utils";
 import RefereeCard from "./RefereeCard";
 import RefereeCardSkeleton from "./RefereeCardSkeleton";
 
@@ -114,17 +115,14 @@ const RefereeList = ({ filters }: RefereeListProps) => {
     fetchReferees();
   }, []);
 
-  const normalize = (s: string) =>
-    s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-
   const getFilteredReferees = () => {
     let filtered = referees;
 
     if (filters?.region) {
-      const regionNorm = normalize(filters.region);
+      const regionNorm = normalizeLocationText(filters.region);
       filtered = filtered.filter((r) => {
         if (!r.region) return false;
-        const refRegion = normalize(r.region);
+        const refRegion = normalizeLocationText(r.region);
         return refRegion.includes(regionNorm) || regionNorm.includes(refRegion);
       });
     }
@@ -136,11 +134,9 @@ const RefereeList = ({ filters }: RefereeListProps) => {
     }
 
     if (filters?.location) {
-      const loc = normalize(filters.location);
       filtered = filtered.filter(
         (r) =>
-          (r.region && normalize(r.region).includes(loc)) ||
-          (r.profile?.full_name && normalize(r.profile.full_name).includes(loc))
+          matchesLocationQuery(filters.location!, r.region, r.profile?.full_name)
       );
     }
 
