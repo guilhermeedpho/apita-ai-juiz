@@ -42,9 +42,6 @@ const SearchBar = ({ onFilter }: SearchBarProps) => {
   const [region, setRegion] = useState("");
   const [fieldType, setFieldType] = useState("");
   const [location, setLocation] = useState("");
-  const [minPrice, setMinPrice] = useState("");
-  const [maxPrice, setMaxPrice] = useState("");
-  const [minRating, setMinRating] = useState("");
   const derivedRegion = region ? undefined : inferRegionFromLocation(location);
   const effectiveRegion = region || derivedRegion || undefined;
   const effectiveLocation = region ? location || undefined : derivedRegion ? undefined : location || undefined;
@@ -54,11 +51,8 @@ const SearchBar = ({ onFilter }: SearchBarProps) => {
       region: effectiveRegion,
       fieldType: fieldType || undefined,
       location: effectiveLocation,
-      minPrice: minPrice ? Number(minPrice) : undefined,
-      maxPrice: maxPrice ? Number(maxPrice) : undefined,
-      minRating: minRating ? Number(minRating) : undefined,
     });
-  }, [effectiveLocation, effectiveRegion, fieldType, minPrice, maxPrice, minRating, onFilter]);
+  }, [effectiveLocation, effectiveRegion, fieldType, onFilter]);
 
   const handleClear = () => {
     setRegion("");
