@@ -35,9 +35,6 @@ export interface RefereeFilters {
   region?: string;
   fieldType?: string;
   location?: string;
-  minPrice?: number;
-  maxPrice?: number;
-  minRating?: number;
 }
 
 interface RefereeListProps {
