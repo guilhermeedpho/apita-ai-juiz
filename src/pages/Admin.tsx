@@ -13,6 +13,7 @@ import AdminFinancials from "@/components/AdminFinancials";
 import AdminUsers from "@/components/AdminUsers";
 import AdminSupportMessages from "@/components/AdminSupportMessages";
 import AdminMatchesManager from "@/components/AdminMatchesManager";
+import AdminMetrics from "@/components/AdminMetrics";
 
 interface Verification {
   id: string;
