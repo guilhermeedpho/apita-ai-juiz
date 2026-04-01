@@ -50,8 +50,11 @@ const SearchBar = ({ onFilter }: SearchBarProps) => {
       region: effectiveRegion,
       fieldType: fieldType || undefined,
       location: effectiveLocation,
+      minPrice: minPrice ? Number(minPrice) : undefined,
+      maxPrice: maxPrice ? Number(maxPrice) : undefined,
+      minRating: minRating ? Number(minRating) : undefined,
     });
-  }, [effectiveLocation, effectiveRegion, fieldType, onFilter]);
+  }, [effectiveLocation, effectiveRegion, fieldType, minPrice, maxPrice, minRating, onFilter]);
 
   const handleClear = () => {
     setRegion("");
