@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import SearchBar from "@/components/SearchBar";
@@ -12,24 +13,41 @@ import RefereeMapWrapper from "@/components/RefereeMapWrapper";
 import Footer from "@/components/Footer";
 
 const Index = () => {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
+  const navigate = useNavigate();
   const [isReferee, setIsReferee] = useState(false);
   const [checked, setChecked] = useState(false);
   const [filters, setFilters] = useState<RefereeFilters>({});
 
   useEffect(() => {
+    if (authLoading) return;
+
     if (!user) {
       setIsReferee(false);
       setChecked(true);
       return;
     }
 
-    supabase.rpc("has_role", { _user_id: user.id, _role: "referee" as const })
-      .then(({ data }) => {
-        setIsReferee(!!data);
-        setChecked(true);
-      });
-  }, [user]);
+    // Check if user has a profile photo — if not, redirect to profile
+    const checkPhoto = async () => {
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("avatar_url")
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+      if (!profile?.avatar_url) {
+        navigate("/perfil");
+        return;
+      }
+
+      const { data } = await supabase.rpc("has_role", { _user_id: user.id, _role: "referee" as const });
+      setIsReferee(!!data);
+      setChecked(true);
+    };
+
+    checkPhoto();
+  }, [user, authLoading, navigate]);
 
   if (!checked) {
     return (

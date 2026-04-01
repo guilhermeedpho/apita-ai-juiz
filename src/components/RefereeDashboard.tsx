@@ -4,7 +4,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { CalendarDays, Star, DollarSign, MapPin, Check, X, Loader2 } from "lucide-react";
+import { CalendarDays, Star, DollarSign, MapPin, Check, X, Loader2, AlertTriangle } from "lucide-react";
 import ChatDialog from "./ChatDialog";
 import RefereeFinancials from "./RefereeFinancials";
 import { useToast } from "@/hooks/use-toast";
@@ -125,6 +125,19 @@ const RefereeDashboard = () => {
   return (
     <section className="py-16">
       <div className="container mx-auto px-4">
+        {/* Referee Rules Notification */}
+        <div className="mb-6 rounded-xl border border-accent/40 bg-accent/10 p-4 flex items-start gap-3">
+          <AlertTriangle className="h-5 w-5 text-accent shrink-0 mt-0.5" />
+          <div className="space-y-1">
+            <p className="text-sm font-semibold text-accent">Lembrete Importante</p>
+            <p className="text-sm text-foreground">
+              🥋 <strong>Esteja sempre uniformizado</strong> em todas as partidas. 
+              ⏰ <strong>Chegue com 10 minutos de antecedência</strong> no local do jogo. 
+              Profissionalismo é a base da sua reputação na plataforma!
+            </p>
+          </div>
+        </div>
+
         <h2 className="text-5xl md:text-7xl font-display mb-10">
           SEU <span className="text-gradient-primary">PAINEL</span>
         </h2>
