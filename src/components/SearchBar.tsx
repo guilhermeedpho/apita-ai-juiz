@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { Calendar, Search, X, DollarSign, Star } from "lucide-react";
+import { Calendar, Search, X } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar as CalendarComp } from "@/components/ui/calendar";
 import { format } from "date-fns";
@@ -42,9 +42,6 @@ const SearchBar = ({ onFilter }: SearchBarProps) => {
   const [region, setRegion] = useState("");
   const [fieldType, setFieldType] = useState("");
   const [location, setLocation] = useState("");
-  const [minPrice, setMinPrice] = useState("");
-  const [maxPrice, setMaxPrice] = useState("");
-  const [minRating, setMinRating] = useState("");
   const derivedRegion = region ? undefined : inferRegionFromLocation(location);
   const effectiveRegion = region || derivedRegion || undefined;
   const effectiveLocation = region ? location || undefined : derivedRegion ? undefined : location || undefined;
@@ -54,23 +51,17 @@ const SearchBar = ({ onFilter }: SearchBarProps) => {
       region: effectiveRegion,
       fieldType: fieldType || undefined,
       location: effectiveLocation,
-      minPrice: minPrice ? Number(minPrice) : undefined,
-      maxPrice: maxPrice ? Number(maxPrice) : undefined,
-      minRating: minRating ? Number(minRating) : undefined,
     });
-  }, [effectiveLocation, effectiveRegion, fieldType, minPrice, maxPrice, minRating, onFilter]);
+  }, [effectiveLocation, effectiveRegion, fieldType, onFilter]);
 
   const handleClear = () => {
     setRegion("");
     setFieldType("");
     setLocation("");
     setDate(undefined);
-    setMinPrice("");
-    setMaxPrice("");
-    setMinRating("");
   };
 
-  const hasFilters = region || fieldType || location || minPrice || maxPrice || minRating;
+  const hasFilters = region || fieldType || location;
 
   return (
     <section className="py-12">
@@ -141,42 +132,6 @@ const SearchBar = ({ onFilter }: SearchBarProps) => {
                   <Search className="h-4 w-4 mr-2" /> Filtra automaticamente
                 </div>
               )}
-            </div>
-          </div>
-
-          {/* Price & Rating Filters */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4 pt-4 border-t border-border">
-            <div className="flex gap-2 items-center">
-              <DollarSign className="h-4 w-4 text-muted-foreground shrink-0" />
-              <Input
-                type="number"
-                placeholder="Preço mín"
-                value={minPrice}
-                onChange={(e) => setMinPrice(e.target.value)}
-                className="h-10 bg-secondary border-border"
-              />
-              <span className="text-muted-foreground text-sm">-</span>
-              <Input
-                type="number"
-                placeholder="Preço máx"
-                value={maxPrice}
-                onChange={(e) => setMaxPrice(e.target.value)}
-                className="h-10 bg-secondary border-border"
-              />
-            </div>
-            <div className="flex gap-2 items-center">
-              <Star className="h-4 w-4 text-accent shrink-0" />
-              <Select value={minRating} onValueChange={setMinRating}>
-                <SelectTrigger className="h-10 bg-secondary border-border">
-                  <SelectValue placeholder="Avaliação mínima" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="3">⭐ 3+</SelectItem>
-                  <SelectItem value="3.5">⭐ 3.5+</SelectItem>
-                  <SelectItem value="4">⭐ 4+</SelectItem>
-                  <SelectItem value="4.5">⭐ 4.5+</SelectItem>
-                </SelectContent>
-              </Select>
             </div>
           </div>
         </div>

@@ -35,9 +35,6 @@ export interface RefereeFilters {
   region?: string;
   fieldType?: string;
   location?: string;
-  minPrice?: number;
-  maxPrice?: number;
-  minRating?: number;
 }
 
 interface RefereeListProps {
@@ -141,18 +138,6 @@ const RefereeList = ({ filters }: RefereeListProps) => {
         (r) =>
           matchesLocationQuery(filters.location!, r.region, r.profile?.full_name)
       );
-    }
-
-    if (filters?.minPrice !== undefined) {
-      filtered = filtered.filter((r) => r.price_per_match >= filters.minPrice!);
-    }
-
-    if (filters?.maxPrice !== undefined) {
-      filtered = filtered.filter((r) => r.price_per_match <= filters.maxPrice!);
-    }
-
-    if (filters?.minRating !== undefined) {
-      filtered = filtered.filter((r) => r.avgRating >= filters.minRating!);
     }
 
     return filtered;
