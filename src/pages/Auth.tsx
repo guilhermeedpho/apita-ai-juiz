@@ -189,6 +189,16 @@ const Auth = () => {
             </Button>
           </form>
 
+          {isLogin && (
+            <button
+              onClick={handleResendConfirmation}
+              disabled={loading}
+              className="w-full text-center text-xs text-muted-foreground hover:text-primary mt-2 underline"
+            >
+              Reenviar email de confirmação
+            </button>
+          )}
+
           <p className="text-center text-sm text-muted-foreground mt-4">
             {isLogin ? "Não tem conta?" : "Já tem conta?"}{" "}
             <button
