@@ -89,9 +89,32 @@ const Auth = () => {
     setLoading(false);
 
     if (error) {
-      toast({ title: "Erro ao entrar", description: error.message, variant: "destructive" });
+      if (error.message?.includes("Email not confirmed")) {
+        toast({
+          title: "Email não confirmado",
+          description: "Verifique sua caixa de entrada ou clique em 'Reenviar email' abaixo.",
+          variant: "destructive",
+        });
+      } else {
+        toast({ title: "Erro ao entrar", description: error.message, variant: "destructive" });
+      }
     } else {
       navigate(refereeMode ? "/perfil?modo=arbitro" : "/");
+    }
+  };
+
+  const handleResendConfirmation = async () => {
+    if (!email) {
+      toast({ title: "Digite seu email primeiro", variant: "destructive" });
+      return;
+    }
+    setLoading(true);
+    const { error } = await supabase.auth.resend({ type: "signup", email });
+    setLoading(false);
+    if (error) {
+      toast({ title: "Erro ao reenviar", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Email reenviado!", description: "Confira sua caixa de entrada e spam." });
     }
   };
 
@@ -165,6 +188,16 @@ const Auth = () => {
               {loading ? "Aguarde..." : isLogin ? "Entrar" : "Criar conta"}
             </Button>
           </form>
+
+          {isLogin && (
+            <button
+              onClick={handleResendConfirmation}
+              disabled={loading}
+              className="w-full text-center text-xs text-muted-foreground hover:text-primary mt-2 underline"
+            >
+              Reenviar email de confirmação
+            </button>
+          )}
 
           <p className="text-center text-sm text-muted-foreground mt-4">
             {isLogin ? "Não tem conta?" : "Já tem conta?"}{" "}
