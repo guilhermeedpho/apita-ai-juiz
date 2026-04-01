@@ -438,9 +438,14 @@ const Profile = () => {
               </label>
             </div>
             {!avatarUrl && (
-              <p className="text-sm text-destructive text-center font-medium">
-                ⚠️ Adicione uma foto com rosto limpo para completar seu perfil
-              </p>
+              <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-3 text-center space-y-1">
+                <p className="text-sm text-destructive font-semibold">
+                  📸 Foto obrigatória!
+                </p>
+                <p className="text-xs text-destructive/80">
+                  Você precisa adicionar uma foto com rosto visível para usar a plataforma. Sem foto, você será redirecionado para esta página.
+                </p>
+              </div>
             )}
             {uploadingAvatar && <p className="text-xs text-muted-foreground">Enviando...</p>}
           </CardContent>
