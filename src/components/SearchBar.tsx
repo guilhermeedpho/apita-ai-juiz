@@ -134,42 +134,6 @@ const SearchBar = ({ onFilter }: SearchBarProps) => {
               )}
             </div>
           </div>
-
-          {/* Price & Rating Filters */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4 pt-4 border-t border-border">
-            <div className="flex gap-2 items-center">
-              <DollarSign className="h-4 w-4 text-muted-foreground shrink-0" />
-              <Input
-                type="number"
-                placeholder="Preço mín"
-                value={minPrice}
-                onChange={(e) => setMinPrice(e.target.value)}
-                className="h-10 bg-secondary border-border"
-              />
-              <span className="text-muted-foreground text-sm">-</span>
-              <Input
-                type="number"
-                placeholder="Preço máx"
-                value={maxPrice}
-                onChange={(e) => setMaxPrice(e.target.value)}
-                className="h-10 bg-secondary border-border"
-              />
-            </div>
-            <div className="flex gap-2 items-center">
-              <Star className="h-4 w-4 text-accent shrink-0" />
-              <Select value={minRating} onValueChange={setMinRating}>
-                <SelectTrigger className="h-10 bg-secondary border-border">
-                  <SelectValue placeholder="Avaliação mínima" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="3">⭐ 3+</SelectItem>
-                  <SelectItem value="3.5">⭐ 3.5+</SelectItem>
-                  <SelectItem value="4">⭐ 4+</SelectItem>
-                  <SelectItem value="4.5">⭐ 4.5+</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
         </div>
       </div>
     </section>
