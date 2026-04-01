@@ -11,6 +11,7 @@ import Profile from "./pages/Profile.tsx";
 import Admin from "./pages/Admin.tsx";
 import Install from "./pages/Install.tsx";
 import PaymentConfirmed from "./pages/PaymentConfirmed.tsx";
+import MyMatchesPage from "./pages/MyMatchesPage.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
