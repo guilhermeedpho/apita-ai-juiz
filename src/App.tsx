@@ -11,6 +11,7 @@ import Profile from "./pages/Profile.tsx";
 import Admin from "./pages/Admin.tsx";
 import Install from "./pages/Install.tsx";
 import PaymentConfirmed from "./pages/PaymentConfirmed.tsx";
+import MyMatchesPage from "./pages/MyMatchesPage.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -30,6 +31,7 @@ const App = () => (
             <Route path="/admin" element={<Admin />} />
             <Route path="/instalar" element={<Install />} />
             <Route path="/pagamento-confirmado" element={<PaymentConfirmed />} />
+            <Route path="/minhas-partidas" element={<MyMatchesPage />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

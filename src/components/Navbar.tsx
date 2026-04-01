@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Shield, LogOut, User, ShieldCheck } from "lucide-react";
+import { Shield, LogOut, User, ShieldCheck, CalendarDays, Sun, Moon } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -10,12 +10,24 @@ const Navbar = () => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isReferee, setIsReferee] = useState(false);
+  const [darkMode, setDarkMode] = useState(true);
 
   useEffect(() => {
-    if (!user) { setIsAdmin(false); return; }
+    if (!user) { setIsAdmin(false); setIsReferee(false); return; }
     supabase.rpc("has_role", { _user_id: user.id, _role: "admin" as const })
       .then(({ data }) => setIsAdmin(!!data));
+    supabase.rpc("has_role", { _user_id: user.id, _role: "referee" as const })
+      .then(({ data }) => setIsReferee(!!data));
   }, [user]);
+
+  useEffect(() => {
+    if (darkMode) {
+      document.documentElement.classList.remove("light-theme");
+    } else {
+      document.documentElement.classList.add("light-theme");
+    }
+  }, [darkMode]);
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border">
@@ -24,10 +36,19 @@ const Navbar = () => {
           <Shield className="h-7 w-7 text-primary" />
           <span className="font-display text-2xl tracking-wide">APITAJÁ</span>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1">
+          <Button variant="ghost" size="icon" className="h-9 w-9" onClick={() => setDarkMode(!darkMode)}>
+            {darkMode ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+          </Button>
           {user ? (
             <>
               <NotificationBell />
+              {!isReferee && (
+                <Button variant="ghost" size="sm" onClick={() => navigate("/minhas-partidas")} className="font-medium">
+                  <CalendarDays className="h-4 w-4 mr-1" />
+                  <span className="hidden sm:inline">Partidas</span>
+                </Button>
+              )}
               {isAdmin && (
                 <Button variant="ghost" size="sm" onClick={() => navigate("/admin")} className="font-medium">
                   <ShieldCheck className="h-4 w-4 mr-1" />
