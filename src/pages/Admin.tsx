@@ -162,6 +162,10 @@ const Admin = () => {
           <ShieldCheck className="h-8 w-8 text-primary" />
           PAINEL ADMIN
         </h1>
+
+        {/* Overview Metrics */}
+        <AdminMetrics />
+
         {/* Financial Dashboard */}
         <AdminFinancials />
 
