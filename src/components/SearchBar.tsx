@@ -13,13 +13,17 @@ import type { RefereeFilters } from "./RefereeList";
 import LocationSearch from "./LocationSearch";
 
 const regions = [
+  // SP Capital
   "Zona Norte", "Zona Sul", "Zona Leste", "Zona Oeste", "Centro",
   "ABC Paulista", "Guarulhos", "Osasco",
-  "Itaquera", "São Mateus", "Penha", "Tatuapé", "Mooca",
-  "Santana", "Tucuruvi", "Vila Maria",
-  "Santo Amaro", "Interlagos", "Capão Redondo",
-  "Pinheiros", "Butantã", "Lapa",
-  "São Paulo",
+  // Estados / Capitais
+  "São Paulo", "Rio de Janeiro", "Minas Gerais", "Bahia",
+  "Paraná", "Rio Grande do Sul", "Pernambuco", "Ceará",
+  "Pará", "Santa Catarina", "Goiás", "Distrito Federal",
+  "Maranhão", "Amazonas", "Espírito Santo", "Paraíba",
+  "Mato Grosso do Sul", "Mato Grosso", "Rio Grande do Norte",
+  "Alagoas", "Piauí", "Sergipe", "Rondônia", "Tocantins",
+  "Acre", "Amapá", "Roraima",
 ];
 
 const fieldTypes = [

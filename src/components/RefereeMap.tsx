@@ -236,7 +236,7 @@ const RefereeMap = () => {
           <div className="rounded-xl overflow-hidden border border-border" style={{ height: "350px" }}>
             <MapContainer
               center={defaultCenter}
-              zoom={11}
+              zoom={userLocation ? 11 : 4}
               style={{ height: "100%", width: "100%" }}
               scrollWheelZoom={true}
             >
