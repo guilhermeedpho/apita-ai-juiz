@@ -38,6 +38,9 @@ const SearchBar = ({ onFilter }: SearchBarProps) => {
   const [region, setRegion] = useState("");
   const [fieldType, setFieldType] = useState("");
   const [location, setLocation] = useState("");
+  const [minPrice, setMinPrice] = useState("");
+  const [maxPrice, setMaxPrice] = useState("");
+  const [minRating, setMinRating] = useState("");
   const derivedRegion = region ? undefined : inferRegionFromLocation(location);
   const effectiveRegion = region || derivedRegion || undefined;
   const effectiveLocation = region ? location || undefined : derivedRegion ? undefined : location || undefined;
