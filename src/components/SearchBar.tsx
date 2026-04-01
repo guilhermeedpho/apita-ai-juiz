@@ -7,6 +7,7 @@ import { Calendar as CalendarComp } from "@/components/ui/calendar";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
+import { inferRegionFromLocation } from "@/lib/location-utils";
 import type { RefereeFilters } from "./RefereeList";
 import LocationSearch from "./LocationSearch";
 
@@ -36,14 +37,17 @@ const SearchBar = ({ onFilter }: SearchBarProps) => {
   const [region, setRegion] = useState("");
   const [fieldType, setFieldType] = useState("");
   const [location, setLocation] = useState("");
+  const derivedRegion = region ? undefined : inferRegionFromLocation(location);
+  const effectiveRegion = region || derivedRegion || undefined;
+  const effectiveLocation = region ? location || undefined : derivedRegion ? undefined : location || undefined;
 
   useEffect(() => {
     onFilter?.({
-      region: region || undefined,
+      region: effectiveRegion,
       fieldType: fieldType || undefined,
-      location: location || undefined,
+      location: effectiveLocation,
     });
-  }, [region, fieldType, location]);
+  }, [effectiveLocation, effectiveRegion, fieldType, onFilter]);
 
   const handleClear = () => {
     setRegion("");
