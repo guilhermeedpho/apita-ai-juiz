@@ -140,18 +140,6 @@ const RefereeList = ({ filters }: RefereeListProps) => {
       );
     }
 
-    if (filters?.minPrice !== undefined) {
-      filtered = filtered.filter((r) => r.price_per_match >= filters.minPrice!);
-    }
-
-    if (filters?.maxPrice !== undefined) {
-      filtered = filtered.filter((r) => r.price_per_match <= filters.maxPrice!);
-    }
-
-    if (filters?.minRating !== undefined) {
-      filtered = filtered.filter((r) => r.avgRating >= filters.minRating!);
-    }
-
     return filtered;
   };
 
