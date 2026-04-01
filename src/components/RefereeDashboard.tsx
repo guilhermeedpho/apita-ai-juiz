@@ -4,7 +4,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { CalendarDays, Star, DollarSign, MapPin, Check, X, Loader2 } from "lucide-react";
+import { CalendarDays, Star, DollarSign, MapPin, Check, X, Loader2, AlertTriangle } from "lucide-react";
 import ChatDialog from "./ChatDialog";
 import RefereeFinancials from "./RefereeFinancials";
 import { useToast } from "@/hooks/use-toast";
