@@ -15,7 +15,7 @@ interface LocationSearchProps {
   placeholder?: string;
 }
 
-const LocationSearch = ({ value, onChange, placeholder = "Buscar local (ex: Arena 90, São Paulo)" }: LocationSearchProps) => {
+const LocationSearch = ({ value, onChange, placeholder = "Buscar local (ex: Arena 90, Curitiba)" }: LocationSearchProps) => {
   const [query, setQuery] = useState(value);
   const [results, setResults] = useState<LocationResult[]>([]);
   const [showResults, setShowResults] = useState(false);
@@ -46,7 +46,7 @@ const LocationSearch = ({ value, onChange, placeholder = "Buscar local (ex: Aren
     setLoading(true);
     try {
       const res = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q + " São Paulo Brasil")}&limit=5&addressdetails=1`,
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q + " Brasil")}&limit=5&addressdetails=1&countrycodes=br`,
         { headers: { "Accept-Language": "pt-BR" } }
       );
       const data: LocationResult[] = await res.json();

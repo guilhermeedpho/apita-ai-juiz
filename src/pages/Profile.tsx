@@ -475,7 +475,7 @@ const Profile = () => {
                 <Label htmlFor="region" className="flex items-center gap-1">
                   <MapPin className="h-3.5 w-3.5" /> Região
                 </Label>
-                <Input id="region" value={region} onChange={(e) => setRegion(e.target.value)} placeholder="São Paulo - SP" />
+                <Input id="region" value={region} onChange={(e) => setRegion(e.target.value)} placeholder="Ex: Curitiba - PR" />
               </div>
             </div>
             <div className="space-y-2">
