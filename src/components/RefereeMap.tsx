@@ -206,7 +206,7 @@ const RefereeMap = () => {
     );
   };
 
-  const defaultCenter: [number, number] = userLocation || [-23.5505, -46.6340]; // São Paulo center
+  const defaultCenter: [number, number] = userLocation || [-14.2350, -51.9253]; // Brazil center
 
   return (
     <section className="py-8">
