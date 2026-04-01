@@ -15,7 +15,7 @@ interface LocationSearchProps {
   placeholder?: string;
 }
 
-const LocationSearch = ({ value, onChange, placeholder = "Buscar local (ex: Arena 90, São Paulo)" }: LocationSearchProps) => {
+const LocationSearch = ({ value, onChange, placeholder = "Buscar local (ex: Arena 90, Curitiba)" }: LocationSearchProps) => {
   const [query, setQuery] = useState(value);
   const [results, setResults] = useState<LocationResult[]>([]);
   const [showResults, setShowResults] = useState(false);
