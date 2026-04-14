@@ -33,6 +33,9 @@ export default defineConfig(({ mode }) => ({
         display: "standalone",
         orientation: "portrait",
         start_url: "/",
+        id: "/",
+        categories: ["sports", "lifestyle", "utilities"],
+        prefer_related_applications: false,
         icons: [
           {
             src: "/icon-192.png",
@@ -49,6 +52,22 @@ export default defineConfig(({ mode }) => ({
             sizes: "512x512",
             type: "image/png",
             purpose: "maskable",
+          },
+        ],
+        screenshots: [
+          {
+            src: "/screenshot-wide.png",
+            sizes: "1280x720",
+            type: "image/png",
+            form_factor: "wide",
+            label: "Tela inicial do ApitaJá",
+          },
+          {
+            src: "/screenshot-mobile.png",
+            sizes: "390x844",
+            type: "image/png",
+            form_factor: "narrow",
+            label: "ApitaJá no celular",
           },
         ],
       },
