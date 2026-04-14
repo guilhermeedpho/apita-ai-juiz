@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Shield, LogOut, User, ShieldCheck, CalendarDays, Sun, Moon } from "lucide-react";
+import { LogOut, User, ShieldCheck, CalendarDays, Sun, Moon } from "lucide-react";
+import logoApitaJa from "@/assets/logo_apita_ja.png";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -33,8 +34,7 @@ const Navbar = () => {
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
         <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate("/")}>
-          <Shield className="h-7 w-7 text-primary" />
-          <span className="font-display text-2xl tracking-wide">APITAJÁ</span>
+          <img src={logoApitaJa} alt="ApitaJá" className="h-8" />
         </div>
         <div className="flex items-center gap-1">
           <Button variant="ghost" size="icon" className="h-9 w-9" onClick={() => setDarkMode(!darkMode)}>
