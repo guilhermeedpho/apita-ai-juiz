@@ -11,11 +11,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # Node correto
+      # 🔥 NODE CORRETO (AGORA 22)
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
 
       - name: Install dependencies
         run: npm install
@@ -23,29 +23,29 @@ jobs:
       - name: Build web
         run: npm run build
 
-      # Java CORRETO (resolve seu erro)
+      # 🔥 JAVA 21
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '21'
 
-      # Android SDK
+      # 🔥 ANDROID
       - name: Setup Android
         uses: android-actions/setup-android@v3
 
-      # Capacitor sync
+      # 🔥 CAPACITOR
       - name: Sync Capacitor
         run: npx cap sync android
 
-      # Build do AAB
+      # 🔥 BUILD
       - name: Build AAB
         run: |
           cd android
           chmod +x gradlew
           ./gradlew bundleRelease
 
-      # Upload (VERSÃO CORRIGIDA)
+      # 🔥 UPLOAD (v4 correto)
       - name: Upload AAB
         uses: actions/upload-artifact@v4
         with:
