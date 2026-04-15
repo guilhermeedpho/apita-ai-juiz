@@ -29,11 +29,11 @@ jobs:
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
-          java-version: '21'
+          java-version: '17'
 
       - name: Generate Keystore
         run: |
-          keytool -genkey -v -keystore my-release-key.jks -storepass 123456 -alias my-key-alias -keypass 123456 -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=App, OU=Dev, O=Company, L=City, S=State, C=BR"
+          keytool -genkey -v -keystore android/app/my-release-key.jks -storepass 123456 -alias my-key-alias -keypass 123456 -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=App, OU=Dev, O=Company, L=City, S=State, C=BR"
 
       - name: Create keystore properties
         run: |
