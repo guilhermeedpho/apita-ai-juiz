@@ -1,4 +1,4 @@
-name: Build Signed AAB Final
+name: Build Android AAB
 
 on:
   workflow_dispatch:
@@ -8,40 +8,38 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v3
 
-      - uses: actions/setup-node@v4
+      - name: Setup Node
+        uses: actions/setup-node@v3
         with:
-          node-version: 22
+          node-version: 18
 
-      - run: npm install
-      - run: npm run build
-      - run: npx cap sync android
+      - name: Install dependencies
+        run: npm install
 
-      - uses: actions/setup-java@v4
+      - name: Build web
+        run: npm run build
+
+      - name: Sync Capacitor
+        run: npx cap sync android
+
+      - name: Setup Java
+        uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
-          java-version: '21'
+          java-version: '17'
 
-      # 🔥 GERA CHAVE DENTRO DO GITHUB (SEM CMD)
       - name: Generate Keystore
         run: |
-          keytool -genkey -v \
-          -keystore android/app/upload-keystore.jks \
-          -alias upload \
-          -keyalg RSA \
-          -keysize 2048 \
-          -validity 10000 \
-          -storepass 123456 \
-          -keypass 123456 \
-          -dname "CN=App, OU=Dev, O=Company, L=City, S=State, C=BR"
+          keytool -genkey -v -keystore my-release-key.jks -storepass 123456 -alias my-key-alias -keypass 123456 -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=App, OU=Dev, O=Company, L=City, S=State, C=BR"
 
-      # 🔥 CONFIGURA ASSINATURA
       - name: Create keystore properties
         run: |
-          echo "storeFile=upload-keystore.jks" > android/keystore.properties
+          echo "storeFile=my-release-key.jks" > android/keystore.properties
           echo "storePassword=123456" >> android/keystore.properties
-          echo "keyAlias=upload" >> android/keystore.properties
+          echo "keyAlias=my-key-alias" >> android/keystore.properties
           echo "keyPassword=123456" >> android/keystore.properties
 
       - name: Build AAB
@@ -49,7 +47,8 @@ jobs:
           cd android
           ./gradlew bundleRelease
 
-      - uses: actions/upload-artifact@v4
+      - name: Upload AAB
+        uses: actions/upload-artifact@v4
         with:
           name: app-release
-          path: android/app/build/outputs/bundle/release/*.aab
+          path: android/app/build/outputs/bundle/release/app-release.aab
