@@ -1,4 +1,4 @@
-name: Build Android AAB Signed
+name: Build Android AAB (Play Store)
 
 on:
   workflow_dispatch:
@@ -25,41 +25,19 @@ jobs:
       - name: Sync Capacitor
         run: npx cap sync android
 
-      # 🔥 INSTALA JAVA CORRETO
+      # JAVA 21 obrigatório
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '21'
 
-      # 🔥 CRIA CHAVE AUTOMÁTICA
-      - name: Generate Keystore
-        run: |
-          keytool -genkey -v \
-          -keystore android/app/upload-keystore.jks \
-          -alias upload \
-          -keyalg RSA \
-          -keysize 2048 \
-          -validity 10000 \
-          -storepass 123456 \
-          -keypass 123456 \
-          -dname "CN=App, OU=Dev, O=Company, L=City, S=State, C=BR"
-
-      # 🔥 CONFIGURA ASSINATURA
-      - name: Create keystore properties
-        run: |
-          echo "storeFile=upload-keystore.jks" > android/keystore.properties
-          echo "storePassword=123456" >> android/keystore.properties
-          echo "keyAlias=upload" >> android/keystore.properties
-          echo "keyPassword=123456" >> android/keystore.properties
-
-      # 🔥 BUILD ASSINADO
-      - name: Build AAB Signed
+      # 🔥 BUILD OFICIAL (SEM ASSINATURA MANUAL)
+      - name: Build AAB
         run: |
           cd android
           ./gradlew bundleRelease
 
-      # 🔥 UPLOAD DO ARQUIVO
       - name: Upload AAB
         uses: actions/upload-artifact@v4
         with:
