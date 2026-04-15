@@ -25,9 +25,16 @@ jobs:
       - name: Sync Capacitor
         run: npx cap sync android
 
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
       - name: Build AAB
         run: |
           cd android
+          chmod +x gradlew
           ./gradlew bundleRelease
 
       - name: Upload AAB
