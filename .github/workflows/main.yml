@@ -25,6 +25,13 @@ jobs:
       - name: Sync Capacitor
         run: npx cap sync android
 
+      # 🔥 FIX JAVA 21
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
       # 🔥 GERAR KEYSTORE AUTOMÁTICO
       - name: Generate Keystore
         run: |
