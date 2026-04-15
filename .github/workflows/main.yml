@@ -1,4 +1,4 @@
-name: Build Android AAB
+name: Build Android AAB Signed
 
 on:
   workflow_dispatch:
@@ -25,17 +25,27 @@ jobs:
       - name: Sync Capacitor
         run: npx cap sync android
 
-      - name: Setup Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: '21'
+      # 🔥 GERAR KEYSTORE AUTOMÁTICO
+      - name: Generate Keystore
+        run: |
+          keytool -genkey -v -keystore android/app/upload-keystore.jks \
+          -storepass 12345678 \
+          -keypass 12345678 \
+          -alias upload \
+          -keyalg RSA \
+          -keysize 2048 \
+          -validity 10000 \
+          -dname "CN=App,O=App,L=SP,S=SP,C=BR"
 
-      - name: Build AAB
+      # 🔥 BUILD ASSINADO
+      - name: Build AAB Signed
         run: |
           cd android
-          chmod +x gradlew
-          ./gradlew bundleRelease
+          ./gradlew bundleRelease \
+          -Pandroid.injected.signing.store.file=app/upload-keystore.jks \
+          -Pandroid.injected.signing.store.password=12345678 \
+          -Pandroid.injected.signing.key.alias=upload \
+          -Pandroid.injected.signing.key.password=12345678
 
       - name: Upload AAB
         uses: actions/upload-artifact@v4
