@@ -1,4 +1,4 @@
-name: Build Android AAB (Play Store)
+name: Build Signed AAB Final
 
 on:
   workflow_dispatch:
@@ -8,38 +8,48 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 22
 
-      - name: Install dependencies
-        run: npm install
+      - run: npm install
+      - run: npm run build
+      - run: npx cap sync android
 
-      - name: Build web
-        run: npm run build
-
-      - name: Sync Capacitor
-        run: npx cap sync android
-
-      # JAVA 21 obrigatório
-      - name: Setup Java
-        uses: actions/setup-java@v4
+      - uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '21'
 
-      # 🔥 BUILD OFICIAL (SEM ASSINATURA MANUAL)
+      # 🔥 GERA CHAVE DENTRO DO GITHUB (SEM CMD)
+      - name: Generate Keystore
+        run: |
+          keytool -genkey -v \
+          -keystore android/app/upload-keystore.jks \
+          -alias upload \
+          -keyalg RSA \
+          -keysize 2048 \
+          -validity 10000 \
+          -storepass 123456 \
+          -keypass 123456 \
+          -dname "CN=App, OU=Dev, O=Company, L=City, S=State, C=BR"
+
+      # 🔥 CONFIGURA ASSINATURA
+      - name: Create keystore properties
+        run: |
+          echo "storeFile=upload-keystore.jks" > android/keystore.properties
+          echo "storePassword=123456" >> android/keystore.properties
+          echo "keyAlias=upload" >> android/keystore.properties
+          echo "keyPassword=123456" >> android/keystore.properties
+
       - name: Build AAB
         run: |
           cd android
           ./gradlew bundleRelease
 
-      - name: Upload AAB
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
           name: app-release
           path: android/app/build/outputs/bundle/release/*.aab
