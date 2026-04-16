@@ -11,7 +11,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # 🔥 NODE CORRETO (AGORA 22)
+      # Node
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
@@ -23,56 +23,29 @@ jobs:
       - name: Build web
         run: npm run build
 
-      # 🔥 JAVA 21
+      # Java
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '21'
 
-      # 🔥 ANDROID
+      # Android SDK
       - name: Setup Android
         uses: android-actions/setup-android@v3
 
-      - name: Validate Android signing secrets
-        env:
-          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
-          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
-          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
-        run: |
-          test -n "$ANDROID_KEYSTORE_BASE64" || { echo "Missing ANDROID_KEYSTORE_BASE64 secret"; exit 1; }
-          test -n "$ANDROID_KEYSTORE_PASSWORD" || { echo "Missing ANDROID_KEYSTORE_PASSWORD secret"; exit 1; }
-          test -n "$ANDROID_KEY_ALIAS" || { echo "Missing ANDROID_KEY_ALIAS secret"; exit 1; }
-          test -n "$ANDROID_KEY_PASSWORD" || { echo "Missing ANDROID_KEY_PASSWORD secret"; exit 1; }
-
-      - name: Prepare Android signing
-        env:
-          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
-          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
-          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
-        run: |
-          printf '%s' "$ANDROID_KEYSTORE_BASE64" | base64 --decode > "$GITHUB_WORKSPACE/android/upload-keystore.jks"
-          cat > "$GITHUB_WORKSPACE/android/keystore.properties" <<EOF
-          storeFile=$GITHUB_WORKSPACE/android/upload-keystore.jks
-          storePassword=$ANDROID_KEYSTORE_PASSWORD
-          keyAlias=$ANDROID_KEY_ALIAS
-          keyPassword=$ANDROID_KEY_PASSWORD
-          EOF
-
-      # 🔥 CAPACITOR
+      # Capacitor
       - name: Sync Capacitor
         run: npx cap sync android
 
-      # 🔥 BUILD
+      # Build AAB (SEM ASSINATURA MANUAL)
       - name: Build AAB
         run: |
           cd android
           chmod +x gradlew
           ./gradlew bundleRelease
 
-      # 🔥 UPLOAD (v4 correto)
+      # Upload do arquivo
       - name: Upload AAB
         uses: actions/upload-artifact@v4
         with:
