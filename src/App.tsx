@@ -34,6 +34,7 @@ const App = () => (
             <Route path="/pagamento-confirmado" element={<PaymentConfirmed />} />
             <Route path="/minhas-partidas" element={<MyMatchesPage />} />
             <Route path="/privacidade" element={<Privacidade />} />
+            <Route path="/privacy" element={<Privacidade />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
