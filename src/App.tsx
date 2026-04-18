@@ -12,6 +12,7 @@ import Admin from "./pages/Admin.tsx";
 import Install from "./pages/Install.tsx";
 import PaymentConfirmed from "./pages/PaymentConfirmed.tsx";
 import MyMatchesPage from "./pages/MyMatchesPage.tsx";
+import Privacidade from "./pages/Privacidade.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -32,6 +33,7 @@ const App = () => (
             <Route path="/instalar" element={<Install />} />
             <Route path="/pagamento-confirmado" element={<PaymentConfirmed />} />
             <Route path="/minhas-partidas" element={<MyMatchesPage />} />
+            <Route path="/privacidade" element={<Privacidade />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

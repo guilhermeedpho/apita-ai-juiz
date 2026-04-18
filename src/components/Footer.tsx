@@ -1,4 +1,5 @@
 import { Shield } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Footer = () => {
   return (
@@ -9,9 +10,12 @@ const Footer = () => {
             <Shield className="h-5 w-5 text-primary" />
             <span className="font-display text-xl">APITAJÁ</span>
           </div>
-          <p className="text-sm text-muted-foreground">
-            © 2026 ApitaJá. Todos os direitos reservados.
-          </p>
+          <div className="flex items-center gap-4 text-sm text-muted-foreground">
+            <Link to="/privacidade" className="hover:text-foreground transition-colors">
+              Política de Privacidade
+            </Link>
+            <span>© 2026 ApitaJá.</span>
+          </div>
         </div>
       </div>
     </footer>
